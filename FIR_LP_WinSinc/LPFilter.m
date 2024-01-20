@@ -1,50 +1,43 @@
-
 % Main variables
 fs = 2000;      % Sampling rate
 Ts = 1/fs;      % Sampling period
 N = length(h);  % filter length
+lpad = 2048;    % do not change
 
 % create the time vector
 t = 0:Ts:(N-1)*Ts;
 
 % plot the impulse response of the filter
 subplot(3, 1, 1)
-plot(t, h);
+stem(t, h, 'b', 'LineWidth', 1); % Blue stems for impulse response
 grid on
+xlabel('Time (s)');
+ylabel('Amplitude');
+title('Impulse Response of the Filter');
 
-% compute the frequency response
-H = fft(h);
-% create the frequency vector
-f = 0:fs/N:fs-fs/N;
+% compute the frequency response and the frequency axis
+% Frequency axis
+f = (0:lpad/2)*(fs/lpad);
+% Frequency response
+H = fft(h, lpad);
+H = H(1:lpad/2+1);
 
-% cut the response in half (0 to nyquist frequency)
-f = f(1:(N-1)/2);
-H = H(1:(N-1)/2);
-
-% plot the linear amplitude response
-subplot(3, 1, 2);
-plot(f, abs(H));
+% plot the frequency response (linear)
+subplot(3, 1, 2)
+plot(f, abs(H), 'r', 'LineWidth', 1); % Red line for linear frequency response
+grid on
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+title('Linear Frequency Response');
+legend('Filter Response');
 ylim([-0.1, 1.1]);
 
+% plot the frequency response (logarithmic)
+subplot(3, 1, 3)
+plot(f, 20*log10(abs(H)), 'g', 'LineWidth', 1); % Green line for logarithmic frequency response
 grid on
-
-% plot the logarithmic amplitude response
-subplot(3, 1, 3);
-plot(f, 20*log10(abs(H)));
-ylim([-80, 10]);
-grid on
-
-% create a sine wave
-t = 0:Ts:1;
-x = sin(10*pi*t);
-% filter the signal
-x_filtered = conv(x, h);
-
-figure;
-plot(t, x);
-legend('original')
-hold on
-plot(t, x_filtered(1:length(t)))
-legend('filtered')
-grid on
-legend on
+xlabel('Frequency (Hz)');
+ylabel('Magnitude (dB)');
+title('Logarithmic Frequency Response');
+legend('Filter Response');
+ylim([-140, 10]);
