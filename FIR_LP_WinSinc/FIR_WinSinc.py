@@ -89,20 +89,28 @@ class LP_Filter(Window):
         self.sampling = sampling
         self.valid = 1
 
-        if(self.cutoff > PI):       # Nyquist-Shannon Sampling theorem violated
-            self.valid = 0
-            print(f"Cutoff frequency canno exceed {sampling/2} Hz")
+        if(transition>0 and cutoff>0 and sampling>0):
+            if(self.cutoff > PI):       # Nyquist-Shannon Sampling theorem violated
+                self.valid = 0
+                print(f"Cutoff frequency canno exceed {sampling/2} Hz")
 
-        elif(transition/2+self.cutoff >= PI or self.cutoff-transition/2 <= 0):  # Transisition band too large
-            self.valid = 0
-            print("Transition band too large")
+            elif(transition/2+self.cutoff >= PI or self.cutoff-transition/2 <= 0):  # Transisition band too large
+                self.valid = 0
+                print("Transition band too large")
+            
+            if(transition < 0.0001):
+                self.valid = 0
+                print("Transition band too narrow")
 
-        if(attenuation > 74):       # Attenuation too high
+            if(attenuation > 74):       # Attenuation too high
+                self.valid = 0
+                print("Attenuation value is too high (Max = 74dB)")
+        else:
             self.valid = 0
-            print("Attenuation value is too high (Max = 74dB)")
+            print("Sampling, cutoff and transition must be > 0")
 
         if(self.valid == 1):
-            super().__init__(attenuation, transition)
+            super().__init__(abs(attenuation), transition)
 
     # define the method that returns the final impulse response
     def impulse(self):
@@ -126,10 +134,10 @@ class LP_Filter(Window):
 
 
 # user defined variables
-sampling = 2000       # Sampling rate in samples/s or Hz
-cutoff = 500         # Cutoff frequency in Hz
-transition = 50       # Transition band width in Hz
-attenuation = 51        # Attenuation in dB
+sampling = 2000         # Sampling rate in samples/s or Hz
+cutoff = 500            # Cutoff frequency in Hz
+transition = 20         # Transition band width in Hz
+attenuation = 73        # Attenuation in dB
 
 
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
