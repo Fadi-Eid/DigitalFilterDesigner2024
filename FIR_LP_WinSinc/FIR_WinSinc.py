@@ -125,7 +125,7 @@ class LP_Filter(Window):
 # user defined variables
 sampling = 2000        # Sampling rate in samples/s or Hz
 cutoff = 555           # Cutoff frequency in Hz
-transition = 70        # Transition band width in Hz
+transition = 50        # Transition band width in Hz
 attenuation = 30        # Attenuation in dB
 
 
@@ -133,11 +133,34 @@ lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 
 h = lowPass.impulse()
 
+
+# Plot the impulse response and the window function if valid
 if(lowPass.valid == 1):
+
+    # print the coefficients
     for i in h:
         print(f"{i}, ")
+    
+    # print the filter's length and group delay
     print(f"The number of coefficients is {lowPass.length}")
     print(f"The delay of this filter is {lowPass.delay()*1000} ms")
-    plt.plot(h)
+
+    # Plotting the generated impulse response
+    plt.plot(h, label='h[n]', marker='o')
+
+    # Plotting the chosen window function
+    w = lowPass.window()
+    plt.plot(w, label='w[n]', marker='o')
+
+    # Add labels and title
+    plt.xlabel('sample')
+    plt.ylabel('amplitude')
+    plt.title('Impulse response of the designed filter')
+
+    # Add legend and grid
+    plt.legend()
+    plt.grid(True)
+
+    # Show the plot
     plt.show()
 
