@@ -24,6 +24,7 @@ To design a low-pass FIR filter, an instance of the class LP_Filter() should be 
 * transition: The desired transition band width of the filter in Hz
 * attenuation: The desired pass-band ripple and stop-band attenuation in dB
 > the windowed-sinc method will create a filter with the same ripple in both the pass-band and the stop-band
+> 
 ![python_code](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/40893112-d8aa-4107-b74a-327d6b8371a1)
 
 The methods that can be used with the **__LP_Filter() class__**:
