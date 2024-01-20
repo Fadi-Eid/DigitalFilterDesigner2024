@@ -8,9 +8,11 @@ Version V1.1 contains the algorithm for FIR low-pass filter design written in Py
 The FIR filter coefficients will be calculated, printed and plotted according to the desired filter specifications such as the cutoff frequency, the transition band width, and the desired attenuation and ripple.
 
 **A MATLAB script is provided to check the filter's characteristics if needed**
+
 ![matlab_frequency_response](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/6af83828-c50a-451b-a067-8e62ad76c57b)
 
 **The example code in Python will generate a visual plot of the generate impulse response, as well as the window function used.**
+
 ![python_plot](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/ee0287c6-48da-458c-aaee-46437fc7c4ae)
 
 
