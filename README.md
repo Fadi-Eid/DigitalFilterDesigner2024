@@ -7,6 +7,8 @@ the algorithm for FIR filter design using the windowed-sinc method had been impl
 in Python. The code will generate the FIR filter coefficients according to the filter specifications
 defined in the code.
 
+** A MATLAB code is provided to check the filter's characteristics if needed **
+
 ## How To Use
 To use the Python script for FIR filter design, the LP_Filter() class takes in only 4 parameters which are:
 * sampling: The sampling frequency in Hz
