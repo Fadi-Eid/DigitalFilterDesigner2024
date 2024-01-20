@@ -18,15 +18,11 @@ BLACKMAN = 4
 # Define the window class
 class Window:
     def __init__(self, attenuation, transition):
-        self.valid = 1      # 1 means that the filter can be calculated
         self.attenuation = attenuation  # Peak approximation error in dB
         self.transition = transition    # Transition band width in rads/s
 
-        if(abs(self.attenuation) > 74):
-            self.valid = 0  # Attenuation in too high, filter is invalid
-
         # find the window type based on attenuation and the window length based on TBW
-        elif (abs(self.attenuation) <= 21):
+        if (abs(self.attenuation) <= 21):
             self.winFunc = RECTANGULAR    # Rectangular function
             self.L = math.ceil((1.8*PI)/self.transition)
 
@@ -54,10 +50,7 @@ class Window:
 
     # window function according to the window type
     def window(self):
-        if(self.valid == 0):
-            W = 0       # No valid window function for the required attenuation (too high)
-        
-        elif (self.winFunc == RECTANGULAR):
+        if (self.winFunc == RECTANGULAR):
             # rectangular function definition
             W = np.ones(self.L, dtype=int)
 
@@ -94,20 +87,27 @@ class LP_Filter(Window):
         self.cutoff = (2*PI*cutoff)/sampling    # convert to rads/sec
         self.length = 0
         self.sampling = sampling
-        super().__init__(attenuation, transition)
+        self.valid = 1
 
         if(self.cutoff > PI):       # Nyquist-Shannon Sampling theorem violated
-            self.valid =0
+            self.valid = 0
+            print(f"Cutoff frequency canno exceed {sampling/2} Hz")
+
+        elif(transition/2+self.cutoff >= PI or self.cutoff-transition/2 <= 0):  # Transisition band too large
+            self.valid = 0
+            print("Transition band too large")
+
+        if(attenuation > 74):       # Attenuation too high
+            self.valid = 0
+            print("Attenuation value is too high (Max = 74dB)")
+
+        if(self.valid == 1):
+            super().__init__(attenuation, transition)
 
     # define the method that returns the final impulse response
     def impulse(self):
         if(self.valid == 0):
-            print("Attenuation value is too high")
-            return 0
-        elif(self.cutoff >= PI):
-            print(f"Cutoff frequency is limited to {self.sampling/2} (Nyquist frequency)")
-            self.valid = 0
-            return 0
+            return 0        
     
         else:
             n = np.arange(self.L)
@@ -118,15 +118,18 @@ class LP_Filter(Window):
         
     # define the function that computes the delay from the filter
     def delay(self):
-        return (self.M/2)/self.sampling
+        if(self.valid == 0):
+            return 0
+        else:
+            return (self.M/2)/self.sampling
     
 
 
 # user defined variables
-sampling = 2000        # Sampling rate in samples/s or Hz
-cutoff = 555           # Cutoff frequency in Hz
-transition = 50        # Transition band width in Hz
-attenuation = 30        # Attenuation in dB
+sampling = 2000       # Sampling rate in samples/s or Hz
+cutoff = 500         # Cutoff frequency in Hz
+transition = 50       # Transition band width in Hz
+attenuation = 51        # Attenuation in dB
 
 
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
