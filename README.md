@@ -35,6 +35,10 @@ if the filter is invalid
 * __LP_Filter.impulse()__: Return a numpy array containing the designed filter's coefficients
 
 
-## Errata
-V1.1 needs some improvement to cover edge cases such as negative parameters, very large values for the transition bands and other possible bugs.
-Future versions should be able to safely handle all possible edge cases and possible failure points.
+## Future Releases
+Future releases will include:
+* Bugs fix
+* New methods for FIR filter design
+* Design of IIR filters
+* Design of IIR and FIR filters of different types (high-pass, band-pass, band-stop)
+* User interface in the form of a desktop app
