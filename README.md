@@ -1,12 +1,17 @@
 # DigitalFilterDesign
 ### V1.1
 
+
 ## Introduction
 This repostory contains software for the automatic generation of digital filters.
 Version V1.1 contains the algorithm for FIR low-pass filter design written in Python. The algorithm used is the __windowed-sinc__ method for FIR design.
 The FIR filter coefficients will be calculated, printed and plotted according to the desired filter specifications such as the cutoff frequency, the transition band width, and the desired attenuation and ripple.
 
 **A MATLAB script is provided to check the filter's characteristics if needed**
+![matlab_frequency_response](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/6af83828-c50a-451b-a067-8e62ad76c57b)
+
+**The example code in Python will generate a visual plot of the generate impulse response, as well as the window function used.**
+![python_plot](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/ee0287c6-48da-458c-aaee-46437fc7c4ae)
 
 
 ## How To Use
@@ -17,6 +22,7 @@ To design a low-pass FIR filter, an instance of the class LP_Filter() should be 
 * transition: The desired transition band width of the filter in Hz
 * attenuation: The desired pass-band ripple and stop-band attenuation in dB
 > the windowed-sinc method will create a filter with the same ripple in both the pass-band and the stop-band
+![python_code](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/40893112-d8aa-4107-b74a-327d6b8371a1)
 
 The methods that can be used with the **__LP_Filter() class__**:
 * __LP_Filter.valid()__: Return 1 if the filter is valid and 0 if not.
@@ -24,6 +30,7 @@ The methods that can be used with the **__LP_Filter() class__**:
 if the filter is invalid
 * __LP_Filter.delay()__: Returns the filter's group delay (delay added to the original signal) in milliseconds
 * __LP_Filter.impulse()__: Return a numpy array containing the designed filter's coefficients
+
 
 ## Errata
 V1.1 needs some improvement to cover edge cases such as negative parameters, very large values for the transition bands and other possible bugs.
