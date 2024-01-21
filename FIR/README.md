@@ -119,8 +119,8 @@ w = lowPass.window()
 # Validation Guide
 The generated Python plots can be used to validate the generated filters.
 
-Using the logarithmic magnitude response plot, the attenuation in the stop-banf can be validated by checking the peak amplitude of the lobes in the stop-band region. Note that the side lobes should exist after the cutoff frequency + half the transition band width.
-e.g., for Fs=1000Hz, Fc=500Hz and transition=50Hz, the side lobe should exist at frequencies > (500 + 25).
+Using the logarithmic magnitude response plot, the attenuation in the stop-band can be validated by checking the peak amplitude of the lobes in the stop-band region. Note that the side lobes should exist after the cutoff frequency + half the transition band width.
+e.g., for Fs=2000Hz, Fc=500Hz and transition=50Hz, the side lobe should exist at frequencies > (500 + 25).
 
 ![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/da0c3af8-be2c-4c1f-ac28-128af42591fc)
 
