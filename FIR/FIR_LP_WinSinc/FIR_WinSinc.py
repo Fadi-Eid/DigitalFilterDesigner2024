@@ -195,4 +195,3 @@ if(lowPass.valid == 1):
     plt.title('Magnitude Response of the generated Filter (Linear Scale)')
     plt.grid(True)
     plt.show()
-
