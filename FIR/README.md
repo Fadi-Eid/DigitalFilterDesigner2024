@@ -82,7 +82,8 @@ w = lowPass.window()
 The generated Python plots can be used to validate the generated filters.
 Using the logarithmic magnitude response plot, the attenuation in the stop-banf can be validated by checking the peak amplitude of the lobes in the stop-band region
 
-![Uploading image.png…]()
+![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/da0c3af8-be2c-4c1f-ac28-128af42591fc)
+
 
 
 
