@@ -55,20 +55,49 @@ class Kaiser:
 
 class LP_Filter(Kaiser):
     def __init__(self, attenuation, transition, cutoff, sampling):
+        # check if the input is valid
+        self.valid = 1
+        if(attenuation<0):
+            attenuation = abs(attenuation)
+            print(f"Warning, attenuation value < 0. Will use {attenuation} instead")
+        if(attenuation>150):
+            self.valid = 0
+            print(f"Attenuation value is too high")
+        if((transition*2*np.pi)/sampling < 0.0001):
+            self.valid = 0
+            print(f"Transition band is too narrow")
+        if(cutoff < 0 or cutoff >= sampling/2):
+            self.valid = 0
+            print(f"Cutoff frequency violation (Nyquist-Shannon). Cutoff should be < {sampling/2} Hz")
+        if(sampling < 0):
+            self.valid = 0
+            print("Error: Sampling frequency should be a positive number")
+        if(transition/2+cutoff >= sampling/2 or cutoff-transition/2 <= 0):
+            self.valid = 0
+            print("Transition band is too wide")
+
         self.cutoff = cutoff
-        super().__init__(attenuation, transition, sampling)
+        if(self.valid == 1):
+            super().__init__(attenuation, transition, sampling)
 
     def impulse(self):
-        w = super().window()
-        n = np.arange(self.N)
-        cutoff = (self.cutoff*2*np.pi)/self.sampling
-        h = (cutoff/np.pi) * np.sinc( (cutoff*(n - (self.N-1)/2)) / np.pi )
-        return h*w
+        if(self.valid==1):
+            w = super().window()
+            n = np.arange(self.N)
+            cutoff = (self.cutoff*2*np.pi)/self.sampling
+            h = (cutoff/np.pi) * np.sinc( (cutoff*(n - (self.N-1)/2)) / np.pi )
+            return h*w
+        else:
+            return 0
     
     def delay(self):
+        if(self.valid==0):
+            return 0
         return ((self.N-1)/2)/self.sampling
     
     def length(self):
+        if(self.valid==0):
+            return 0
         return self.N
     
 
@@ -79,8 +108,8 @@ class LP_Filter(Kaiser):
 # user defined variables
 sampling = 2000         # Sampling rate in samples/s or Hz
 cutoff = 500            # Cutoff frequency in Hz
-transition = 50         # Transition band width in Hz
-attenuation = 30        # Attenuation in dB
+transition = 30         # Transition band width in Hz
+attenuation = 49       # Attenuation in dB
 
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 
