@@ -136,13 +136,14 @@ class LP_Filter(Window):
 # user defined variables
 sampling = 2000         # Sampling rate in samples/s or Hz
 cutoff = 500            # Cutoff frequency in Hz
-transition = 20         # Transition band width in Hz
-attenuation = 73        # Attenuation in dB
+transition = 50         # Transition band width in Hz
+attenuation = 30        # Attenuation in dB
 
 
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 
 h = lowPass.impulse()
+w = lowPass.window()
 
 
 # Plot the impulse response and the window function if valid
@@ -156,22 +157,42 @@ if(lowPass.valid == 1):
     print(f"The number of coefficients is {lowPass.length}")
     print(f"The delay of this filter is {lowPass.delay()*1000} ms")
 
-    # Plotting the generated impulse response
+    # VALIDATION code
+
+    # Plot impulse response
+    plt.figure(1, figsize=(10, 5))
     plt.plot(h, label='h[n]', marker='o')
-
-    # Plotting the chosen window function
-    w = lowPass.window()
     plt.plot(w, label='w[n]', marker='o')
-
-    # Add labels and title
     plt.xlabel('sample')
     plt.ylabel('amplitude')
     plt.title('Impulse response of the designed filter')
-
-    # Add legend and grid
     plt.legend()
     plt.grid(True)
+    plt.tight_layout()
+    plt.show()
 
-    # Show the plot
+
+    # Zero-padding and Compute frequency response
+    n_fft = 2048  # Increase the resolution of the frequency bins
+    frequencies = np.fft.fftfreq(n_fft, d=1/sampling)
+    magnitude_response = np.abs(np.fft.fft(h, n_fft))
+
+
+    # Plot magnitude response in dB
+    plt.figure(2, figsize=(10, 5))
+    plt.plot(frequencies[:n_fft//2], 20 * np.log10(magnitude_response[:n_fft//2]))
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Magnitude (dB)')
+    plt.title('Magnitude Response of the generated Filter (Logarithmic scale)')
+    plt.grid(True)
+    plt.show()
+
+    # Plot magnitude response in linear scale
+    plt.figure(3, figsize=(10, 5))
+    plt.plot(frequencies[:n_fft//2], magnitude_response[:n_fft//2])
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Magnitude')
+    plt.title('Magnitude Response of the generated Filter (Linear Scale)')
+    plt.grid(True)
     plt.show()
 

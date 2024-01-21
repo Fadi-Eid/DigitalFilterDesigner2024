@@ -44,7 +44,7 @@ class Kaiser:
             I = I + (((x/2)**k)/np.math.factorial(k))**2
         return I
     
-    def kaiser_window(self):
+    def window(self):
         w = np.zeros(self.N)
         for n in range(0, self.N):
             num = self.beta * np.sqrt(1-((2*n)/(self.N-1)-1)**2)
@@ -59,7 +59,7 @@ class LP_Filter(Kaiser):
         super().__init__(attenuation, transition, sampling)
 
     def impulse(self):
-        w = super().kaiser_window()
+        w = super().window()
         n = np.arange(self.N)
         cutoff = (self.cutoff*2*np.pi)/self.sampling
         h = (cutoff/np.pi) * np.sinc( (cutoff*(n - (self.N-1)/2)) / np.pi )
@@ -76,15 +76,16 @@ class LP_Filter(Kaiser):
 ###################################################################################
 # USER CODE
 
-sampling = 2000
-attenuation = 38
-cutoff = 500
-transition = 100
+# user defined variables
+sampling = 2000         # Sampling rate in samples/s or Hz
+cutoff = 500            # Cutoff frequency in Hz
+transition = 50         # Transition band width in Hz
+attenuation = 30        # Attenuation in dB
 
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 
 h = lowPass.impulse()
-w = lowPass.kaiser_window()
+w = lowPass.window()
 
 for i in h:
     print(f"{i}, ")
