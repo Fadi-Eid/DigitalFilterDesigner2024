@@ -78,9 +78,12 @@ lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 h = lowPass.impulse()
 w = lowPass.window()
 ```
-# Plotting and validation
+# Validation Guide
 The generated Python plots can be used to validate the generated filters.
 Using the logarithmic magnitude response plot, the attenuation in the stop-banf can be validated by checking the peak amplitude of the lobes in the stop-band region
+
+![Uploading image.png…]()
+
 
 
 Using the linear magnitude response plot, the transition band width and the cutoff frequencies can be validated. The amplitude should be 0.5 at the cutoff frequency, and the transition band should be in the linear transition region
