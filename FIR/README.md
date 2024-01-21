@@ -1,5 +1,5 @@
 # Introduction
-Two algorithms are used for the generation of FIR low-pass filters:
+### Two algorithms are used for the generation of FIR low-pass filters:
 1. windowed-sinc method: This method is used to generate the FIR filter's impulse response (coefficients) by truncating the shifted ideal response using one of five pre-defined window functions (Rectangular, Barlett, Hamming, Hann, Blackman) each having their own advantages and disadvantages. This method will generate a filter that will often exceed the specifications, such as the stop-band minimum attenuation, which makes it a safe option, but will result in far from optimal number of coefficients, which is sometimes not desired due to the delay introduced
 1. Kaiser Adjustable window method: This method makes use of the Kaiser adjustable window, which is controlled by a variable "beta". This method is a sub-optimal method and will result in a filter whose specification is very close to what is needed thus, lowering the number of coefficients needed, which in turns, decreases the delay cause by the filter.
 The disatvantages of this method is that for large attenuation values, the generated filter's stop-band attenuation may be less than, but very close to the desired attenuation. This requires a validation effort from the user part.
@@ -80,11 +80,16 @@ w = lowPass.window()
 ```
 # Validation Guide
 The generated Python plots can be used to validate the generated filters.
-Using the logarithmic magnitude response plot, the attenuation in the stop-banf can be validated by checking the peak amplitude of the lobes in the stop-band region
+
+Using the logarithmic magnitude response plot, the attenuation in the stop-banf can be validated by checking the peak amplitude of the lobes in the stop-band region. Note that the side lobes should exist after the cutoff frequency + half the transition band width.
+e.g., for Fs=1000Hz, Fc=500Hz and transition=50Hz, the side lobe should exist at frequencies > (500 + 25).
 
 ![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/da0c3af8-be2c-4c1f-ac28-128af42591fc)
 
 
 
 
-Using the linear magnitude response plot, the transition band width and the cutoff frequencies can be validated. The amplitude should be 0.5 at the cutoff frequency, and the transition band should be in the linear transition region
+Using the linear magnitude response plot, the transition band width and the cutoff frequencies can be validated. The amplitude should be 0.5 at the cutoff frequency, and the transition band should be in the linear transition region.
+
+![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/21cb4e94-f722-4e42-8997-91a200164bb8)
+
