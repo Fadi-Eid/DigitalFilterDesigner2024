@@ -1,18 +1,19 @@
-# Project Name: DigitalFilterDesign
+# DigitalFilterDesign
 ## Current Version: V1.2
-# Introduction:
-DigitalFilterDesign is an open-source project dedicated to simplifying the process of digital filter design. The aim is to facilitate the creation of customizable digital filters with ease of design and implementation.
 
-The current version offers Python code for the automatic design of FIR low-pass filters using two methods: the windowed-sinc method and the Kaiser adjustable window method. The algorithms are written in Python, allowing users to generate filter coefficients by adjusting parameters. After filter generation, the frequency domain magnitude response is displayed for validation.
+# Introduction:
+**DigitalFilterDesign** is an open-source project dedicated to simplifying the process of digital filter design. The aim is to facilitate the creation of customizable digital filters with ease of design and implementation.
+
+The current version offers Python code for the automatic design of FIR low-pass filters using two methods: the __**windowed-sinc method**__ and the __**Kaiser adjustable**__ window method. The algorithms are written in Python, allowing users to generate filter coefficients by adjusting parameters. After filter generation, the frequency domain magnitude response is displayed for validation.
 
 Additionally, a MATLAB code is provided for further analysis (optional validation).
 
 # Repository Structure:
 ### The repository consists of three main folders:
 
-1. FIR: Contains algorithms and methods for linear phase finite impulse response filter design.
-2. IIR: Contains algorithms and methods for recursive infinite impulse response filter design.
-3. App: Desktop app presenting a user-friendly, code-less interface for FIR and IIR filter design.
+1. **FIR**: Contains algorithms and methods for linear phase finite impulse response filter design.
+2. **IIR**: Contains algorithms and methods for recursive infinite impulse response filter design.
+3. **App**: Desktop app presenting a user-friendly, code-less interface for FIR and IIR filter design.
 > Each folder includes a readme providing detailed information about the contained code.
 
 # Future Releases:
