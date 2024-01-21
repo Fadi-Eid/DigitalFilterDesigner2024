@@ -60,10 +60,9 @@ This Python code generates the coefficients of a Low Pass FIR (Finite Impulse Re
 - `transition`: Transition band width in Hz.
 - `attenuation`: Attenuation in dB.
 
-## Filter Generation
+## Filter Generation and Validation 
 - `lowPass`: Instance of the LP_Filter class representing the low-pass filter.
 
-## Plotting and Validation
 - Impulse response and window function are plotted if the filter is valid.
 - Coefficients, filter length, and group delay are printed for validation.
 - Frequency response (magnitude) is plotted in both logarithmic and linear scales.
