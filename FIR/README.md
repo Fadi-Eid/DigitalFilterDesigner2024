@@ -1,17 +1,20 @@
 # Introduction
 ### Two algorithms are used for the generation of FIR low-pass filters:
-1. windowed-sinc method: This method is used to generate the FIR filter's impulse response (coefficients) by truncating the shifted ideal response using one of five pre-defined window functions (Rectangular, Barlett, Hamming, Hann, Blackman) each having their own advantages and disadvantages. This method will generate a filter that will often exceed the specifications, such as the stop-band minimum attenuation, which makes it a safe option, but will result in far from optimal number of coefficients, which is sometimes not desired due to the delay introduced
-1. Kaiser Adjustable window method: This method makes use of the Kaiser adjustable window, which is controlled by a variable "beta". This method is a sub-optimal method and will result in a filter whose specification is very close to what is needed thus, lowering the number of coefficients needed, which in turns, decreases the delay cause by the filter.
+1. **__windowed-sinc method__**: This method is used to generate the FIR filter's impulse response (coefficients) by truncating the shifted ideal response using one of five pre-defined window functions (Rectangular, Barlett, Hamming, Hann, Blackman) each having their own advantages and disadvantages. This method will generate a filter that will often exceed the specifications, such as the stop-band minimum attenuation, which makes it a safe option, but will result in far from optimal number of coefficients, which is sometimes not desired due to the delay introduced
+
+1. __**Kaiser Adjustable window method**__: This method makes use of the Kaiser adjustable window, which is controlled by a variable "beta". This method is a sub-optimal method and will result in a filter whose specifications are very close to what is needed thus, lowering the number of coefficients needed, which in turns, decreases the delay cause by the filter.
 The disatvantages of this method is that for large attenuation values, the generated filter's stop-band attenuation may be less than, but very close to the desired attenuation. This requires a validation effort from the user part.
+> For attenuation values > 60dB, validation is recommended for critical applications.
 
 For the validation of any generated filter, the provided Python code will diplay three plots:
-1. Impulse response + window function: This plot can be used to visually check the shape of the window function and the sinc shaped impulse response.
-1. Magnitude response (Logarithmic): This plot is the most important plot, and should be used to check for the validity of the designed filter by checking the peak amplitude of the first lobe in the stop-band
-1. Magnitude response (Linear): This plot can be used to visually check the overall shape of thefrequency response of the filter, the ripple in the pass-band and stop-band, and most importantly, to validate the transition band width.
+1. **Impulse response + window function**: This plot can be used to visually check the shape of the window function and the sinc shaped impulse response.
+1. **Magnitude response (Logarithmic)**: This plot is the most important plot, and should be used to check for the validity of the designed filter by checking the peak amplitude of the first lobe in the stop-band
+1. **Magnitude response (Linear)**: This plot can be used to visually check the overall shape of thefrequency response of the filter, the ripple in the pass-band and stop-band, and most importantly, to validate the transition band width.
 > The validation process will be outlined later in this document.
 
 
 # Code Structure (**__FIR_WinSinc.py)__**
+
 This Python code generates the coefficients of a Low Pass FIR (Finite Impulse Response) filter using the windowed-sinc method. The designed filter's impulse response is computed, and its magnitude response is plotted for validation.
 
 ## Modules
@@ -66,7 +69,8 @@ This Python code generates the coefficients of a Low Pass FIR (Finite Impulse Re
 - Frequency response (magnitude) is plotted in both logarithmic and linear scales.
 
 
-# Code Structure (**__FIR_Kaiser.py)__**
+# Code Structure (**__FIR_Kaiser.py__**)
+
 This Python code implements the design of a Low Pass FIR (Finite Impulse Response) filter using the Kaiser window method. The Kaiser window is utilized for its configurability, allowing users to adjust the filter specifications through parameters such as attenuation, transition bandwidth, and sampling frequency. The Kaiser window method is known for producing filters with a reduced number of coefficients, thus minimizing filter delay. The validation of the generated filter is facilitated through plots of the impulse response and magnitude response.
 
 
