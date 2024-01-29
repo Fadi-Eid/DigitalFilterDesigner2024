@@ -60,7 +60,7 @@ class LP_Filter(Kaiser):
         if(attenuation<0):
             attenuation = abs(attenuation)
             print(f"Warning, attenuation value < 0. Will use {attenuation} instead")
-        if(attenuation>125):
+        if(attenuation>150):
             self.valid = 0
             print(f"Attenuation value is too high")
         if((transition*2*np.pi)/sampling < 0.0001):
@@ -108,24 +108,19 @@ class LP_Filter(Kaiser):
 # user defined variables
 sampling = 2000         # Sampling rate in samples/s or Hz
 cutoff = 300            # Cutoff frequency in Hz
-transition = 80        # Transition band width in Hz
-attenuation = 62       # Attenuation in dB
-# create the lowpass instance with the specified parameters
+transition = 80         # Transition band width in Hz
+attenuation = 72       # Attenuation in dB
+
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 
-# Print impulse response
-if(lowPass.valid == 1):
-    h = lowPass.impulse()
-    w = lowPass.window()
+h = lowPass.impulse()
+w = lowPass.window()
 
-    for i in h:
-        print(f"{i}, ")
+for i in h:
+    print(f"{i}, ")
 
-    print(f"Delay = {lowPass.delay()}")
-    print(f"Coefficients = {lowPass.length()}")
-
-else:
-    print("Error computing impulse response")
+print(f"Delay = {lowPass.delay()}")
+print(f"Coefficients = {lowPass.length()}")
 
 ###################################################################################
 ###################################################################################
@@ -133,39 +128,38 @@ else:
 # VALIDATION code
 
 # Plot impulse response
-if(lowPass.valid == 1):
-    plt.figure(1, figsize=(10, 5))
-    plt.plot(h, label='h[n]', marker='o')
-    plt.plot(w, label='w[n]', marker='o')
-    plt.xlabel('sample')
-    plt.ylabel('amplitude')
-    plt.title('Impulse response of the designed filter')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
+plt.figure(1, figsize=(10, 5))
+plt.plot(h, label='h[n]', marker='o')
+plt.plot(w, label='w[n]', marker='o')
+plt.xlabel('sample')
+plt.ylabel('amplitude')
+plt.title('Impulse response of the designed filter')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
 
 
-    # Zero-padding and Compute frequency response
-    n_fft = 2048  # Increase the resolution of the frequency bins
-    frequencies = np.fft.fftfreq(n_fft, d=1/sampling)
-    magnitude_response = np.abs(np.fft.fft(h, n_fft))
+# Zero-padding and Compute frequency response
+n_fft = 2048  # Increase the resolution of the frequency bins
+frequencies = np.fft.fftfreq(n_fft, d=1/sampling)
+magnitude_response = np.abs(np.fft.fft(h, n_fft))
 
 
-    # Plot magnitude response in dB
-    plt.figure(2, figsize=(10, 5))
-    plt.plot(frequencies[:n_fft//2], 20 * np.log10(magnitude_response[:n_fft//2]))
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Magnitude (dB)')
-    plt.title('Magnitude Response of the generated Filter (Logarithmic scale)')
-    plt.grid(True)
-    plt.show()
+# Plot magnitude response in dB
+plt.figure(2, figsize=(10, 5))
+plt.plot(frequencies[:n_fft//2], 20 * np.log10(magnitude_response[:n_fft//2]))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Magnitude (dB)')
+plt.title('Magnitude Response of the generated Filter (Logarithmic scale)')
+plt.grid(True)
+plt.show()
 
-    # Plot magnitude response in linear scale
-    plt.figure(3, figsize=(10, 5))
-    plt.plot(frequencies[:n_fft//2], magnitude_response[:n_fft//2])
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Magnitude')
-    plt.title('Magnitude Response of the generated Filter (Linear Scale)')
-    plt.grid(True)
-    plt.show()
+# Plot magnitude response in linear scale
+plt.figure(3, figsize=(10, 5))
+plt.plot(frequencies[:n_fft//2], magnitude_response[:n_fft//2])
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Magnitude')
+plt.title('Magnitude Response of the generated Filter (Linear Scale)')
+plt.grid(True)
+plt.show()
