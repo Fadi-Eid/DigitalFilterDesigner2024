@@ -1,26 +1,33 @@
 import numpy as np
 from scipy.linalg import toeplitz
 from scipy.linalg import hankel
+import matplotlib.pyplot as plt
+
+# Filters params
+sampling = 2000
+cutoff = 300
+df = 20
+A = 150 # max dB attenuation
+
 
 # WEIGHTED LEAST SQUARE LOWPASS FILTER
-A = 30  # stop band attenuation in dB
-wp = 0.26 * np.pi  # pass-band
-ws = 0.34 * np.pi  # stop band
-fs = 2 * np.pi  # sampling frequency
+wp = ((cutoff-df/2) * 2* np.pi)/sampling  # pass-band
+ws = ((cutoff+df/2) * 2* np.pi)/sampling  # pass-band
+PI2 = 2 * np.pi  # sampling frequency
 
 # filter length estimation using the fred harris rule of thumb
 if A <= 60:
-    N = round((fs / (ws - wp)) * (abs(A) / 22) * 1.1)
+    N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.1)
 elif A > 60 and A <= 80:
-    N = round((fs / (ws - wp)) * (abs(A) / 22) * 1.25)
+    N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.25)
 elif A > 80 and A <= 150:
-    N = round((fs / (ws - wp)) * (abs(A) / 22) * 1.4)
+    N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.4)
 elif A > 150:
     if A <= 160:
-        N = round((fs / (ws - wp)) * (abs(A) / 22) * 1.52)
+        N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.52)
     else:
         A = 160
-        N = round((fs / (ws - wp)) * (abs(A) / 22) * 1.6)
+        N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.6)
 
 if N % 2 == 0:
     N += 1
@@ -55,3 +62,45 @@ h = np.concatenate([a[M:0:-1], 2 * a[0] * np.ones(1), a[1:M + 1]]) / 2
 
 for i in h:
     print(f"{i}, ")
+
+
+###################################################################################
+###################################################################################
+
+# VALIDATION code
+
+# Plot impulse response
+plt.figure(1, figsize=(10, 5))
+plt.plot(h, label='h[n]', marker='o')
+plt.xlabel('sample')
+plt.ylabel('amplitude')
+plt.title('Impulse response of the designed filter')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+# Zero-padding and Compute frequency response
+n_fft = 2048  # Increase the resolution of the frequency bins
+frequencies = np.fft.fftfreq(n_fft, d=1/sampling)
+magnitude_response = np.abs(np.fft.fft(h, n_fft))
+
+
+# Plot magnitude response in dB
+plt.figure(2, figsize=(10, 5))
+plt.plot(frequencies[:n_fft//2], 20 * np.log10(magnitude_response[:n_fft//2]))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Magnitude (dB)')
+plt.title('Magnitude Response of the generated Filter (Logarithmic scale)')
+plt.grid(True)
+plt.show()
+
+# Plot magnitude response in linear scale
+plt.figure(3, figsize=(10, 5))
+plt.plot(frequencies[:n_fft//2], magnitude_response[:n_fft//2])
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Magnitude')
+plt.title('Magnitude Response of the generated Filter (Linear Scale)')
+plt.grid(True)
+plt.show()
