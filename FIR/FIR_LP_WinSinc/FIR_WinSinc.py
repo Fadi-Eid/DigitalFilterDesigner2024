@@ -136,8 +136,8 @@ class LP_Filter(Window):
 # user defined variables
 sampling = 2000         # Sampling rate in samples/s or Hz
 cutoff = 500            # Cutoff frequency in Hz
-transition = 50         # Transition band width in Hz
-attenuation = 30        # Attenuation in dB
+transition = 80         # Transition band width in Hz
+attenuation = 50        # Attenuation in dB
 
 
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
