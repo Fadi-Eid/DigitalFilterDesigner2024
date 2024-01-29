@@ -4,15 +4,15 @@ from scipy.linalg import hankel
 import matplotlib.pyplot as plt
 
 # Filters params
-sampling = 2000
-cutoff = 300
-df = 20
-A = 150 # max dB attenuation
+sampling = 2000     # sampling frequency in Hz
+cutoff = 300        # cutoff frequency in Hz
+df = 20             # transition band width in Hz
+A = 150             # max dB attenuation
 
 
 # WEIGHTED LEAST SQUARE LOWPASS FILTER
 wp = ((cutoff-df/2) * 2* np.pi)/sampling  # pass-band
-ws = ((cutoff+df/2) * 2* np.pi)/sampling  # pass-band
+ws = ((cutoff+df/2) * 2* np.pi)/sampling  # stop-band
 PI2 = 2 * np.pi  # sampling frequency
 
 # filter length estimation using the fred harris rule of thumb
@@ -63,6 +63,8 @@ h = np.concatenate([a[M:0:-1], 2 * a[0] * np.ones(1), a[1:M + 1]]) / 2
 for i in h:
     print(f"{i}, ")
 
+print(f"Number of coefficients = {N}")
+
 
 ###################################################################################
 ###################################################################################
@@ -82,7 +84,7 @@ plt.show()
 
 
 # Zero-padding and Compute frequency response
-n_fft = 2048  # Increase the resolution of the frequency bins
+n_fft = 2048*2  # Increase the resolution of the frequency bins
 frequencies = np.fft.fftfreq(n_fft, d=1/sampling)
 magnitude_response = np.abs(np.fft.fft(h, n_fft))
 
