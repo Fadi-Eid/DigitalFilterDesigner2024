@@ -19,9 +19,10 @@ Additionally, a MATLAB code is provided for further analysis (optional validatio
 # Future Releases:
 In addition to optimization, improvements, and bug fixes, upcoming releases are planned as follows:
 
-* **V1.1** __(Current)__: Low-pass FIR design using the windowed-sinc method and Kaiser adjustable window.
-* **V1.2**: Low-pass, high-pass, band-pass, and band-stop FIR filter design.
-* **V1.3** __(optional)__: Introduction of an optimal FIR filter design method.
+* **V1.1** : Low-pass FIR design using the windowed-sinc method.
+* **V1.2**__(Current)__:  Low-pass FIR design using the Kaiser adjustable window.
+* **V1.3** __(Under dev)__: Optimal FIR filter design API using the Least-Squares method.
+* **V1.4** : Optimal FIR filter design API using the Parks-McClellan iterative method.
 * **V2.0**: IIR filter design.
 * **V2.1**: __(No specific plans outlined yet)__
 * **V3.0**: Implementation of a desktop interface (App).
