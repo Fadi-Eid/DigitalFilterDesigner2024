@@ -3,67 +3,88 @@ from scipy.linalg import toeplitz
 from scipy.linalg import hankel
 import matplotlib.pyplot as plt
 
+
+class LP_Filter():
+    def __init__(self, attenuation, transition, cutoff, sampling):
+        # check if the input is valid
+        # pass-band and stop-band frequencies
+        self.cutoff = cutoff
+        self.transition = transition
+        self.attenuation = attenuation
+        self.sampling = sampling
+        self.fp = (cutoff-df/2)
+        self.fs = (cutoff+df/2)
+        self.K = 5
+        self.N = 0
+        # filter length estimation using the Fred Harris rule of thumb
+        A = attenuation
+        if A <= 60:
+            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.1)
+        elif A > 60 and A <= 80:
+            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.25)
+        elif A > 80 and A <= 150:
+            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.4)
+        elif A > 150:
+            if A <= 160:
+                self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.52)
+            else:
+                A = 165
+                self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.6)
+        
+        if self.N % 2 == 0:
+            self.N += 1
+        self.M = (self.N - 1) // 2
+
+        # normalize fp and fs
+        self.fp = self.fp / (self.sampling / 2)
+        self.fs = self.fs / (self.sampling / 2)
+
+    def impulse(self):
+        # construct q(k)
+        x1 = np.array([self.fp + self.K * (1 - self.fs)])
+        x2 = self.fp * np.sinc(self.fp * np.arange(1, 2 * self.M+1)) - self.K * self.fs * np.sinc(self.fs * np.arange(1, 2 * self.M + 1))
+        q = np.concatenate((x1, x2))
+
+        # construct Q1, Q2, Q
+        Q1 = toeplitz(q[0:self.M+1])
+        Q2 = hankel(q[:self.M + 1], q[self.M:2 * self.M + 1])
+        Q = (Q1 + Q2) / 2
+
+        # construct b
+        b = self.fp * np.sinc(self.fp * np.arange(self.M + 1))
+
+        # solve linear system to get a(n)
+        a = np.linalg.solve(Q, b)
+
+        # form impulse response h(n)
+        h = np.concatenate([a[self.M:0:-1], 2 * a[0] * np.ones(1), a[1:self.M + 1]]) / 2
+
+        return h
+    
+    def length(self):
+        return self.N
+
+
+
+
+###################################################################################
+###################################################################################
+# USER CODE
 # Filters params
 sampling = 2000     # sampling frequency in Hz
 cutoff = 300        # cutoff frequency in Hz
 df = 20             # transition band width in Hz
 A = 150             # max dB attenuation
 
-# Weighting factor
-K = 5
 
-
-# pass-band and stop-band frequencies
-fp = (cutoff-df/2)
-fs = (cutoff+df/2)
-
-# filter length estimation using the Fred Harris rule of thumb
-if A <= 60:
-    N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.1)
-elif A > 60 and A <= 80:
-    N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.25)
-elif A > 80 and A <= 150:
-    N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.4)
-elif A > 150:
-    if A <= 160:
-        N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.52)
-    else:
-        A = 160
-        N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.6)
-
-if N % 2 == 0:
-    N += 1
-M = (N - 1) // 2
-
-# normalize fp and fs
-fp = fp / (sampling / 2)
-fs = fs / (sampling / 2)
-
-# construct q(k)
-x1 = np.array([fp + K * (1 - fs)])
-x2 = fp * np.sinc(fp * np.arange(1, 2 * M+1)) - K * fs * np.sinc(fs * np.arange(1, 2 * M + 1))
-q = np.concatenate((x1, x2))
-
-# construct Q1, Q2, Q
-Q1 = toeplitz(q[0:M+1])
-Q2 = hankel(q[:M + 1], q[M:2 * M + 1])
-Q = (Q1 + Q2) / 2
-
-# construct b
-b = fp * np.sinc(fp * np.arange(M + 1))
-
-# solve linear system to get a(n)
-a = np.linalg.solve(Q, b)
-
-# form impulse response h(n)
-h = np.concatenate([a[M:0:-1], 2 * a[0] * np.ones(1), a[1:M + 1]]) / 2
-
+lowPass = LP_Filter(A, df, cutoff, sampling)
+h = lowPass.impulse()
 
 
 for i in h:
     print(f"{i}, ")
 
-print(f"Number of coefficients = {N}")
+print(f"Number of coefficients = {lowPass.length()}")
 
 
 ###################################################################################
