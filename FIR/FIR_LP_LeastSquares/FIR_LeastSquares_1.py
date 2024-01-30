@@ -9,35 +9,35 @@ cutoff = 300        # cutoff frequency in Hz
 df = 20             # transition band width in Hz
 A = 150             # max dB attenuation
 
+# Weighting factor
+K = 5
 
-# WEIGHTED LEAST SQUARE LOWPASS FILTER
-wp = ((cutoff-df/2) * 2* np.pi)/sampling  # pass-band
-ws = ((cutoff+df/2) * 2* np.pi)/sampling  # stop-band
-PI2 = 2 * np.pi  # sampling frequency
 
-# filter length estimation using the fred harris rule of thumb
+# pass-band and stop-band frequencies
+fp = (cutoff-df/2)
+fs = (cutoff+df/2)
+
+# filter length estimation using the Fred Harris rule of thumb
 if A <= 60:
-    N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.1)
+    N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.1)
 elif A > 60 and A <= 80:
-    N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.25)
+    N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.25)
 elif A > 80 and A <= 150:
-    N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.4)
+    N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.4)
 elif A > 150:
     if A <= 160:
-        N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.52)
+        N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.52)
     else:
         A = 160
-        N = round((PI2 / (ws - wp)) * (abs(A) / 22) * 1.6)
+        N = round((sampling / (fs - fp)) * (abs(A) / 22) * 1.6)
 
 if N % 2 == 0:
     N += 1
 M = (N - 1) // 2
 
-# set band-edges and stop-band weighting
-K = 5
-# normalize band-edges for convenience
-fp = wp / np.pi
-fs = ws / np.pi
+# normalize fp and fs
+fp = fp / (sampling / 2)
+fs = fs / (sampling / 2)
 
 # construct q(k)
 x1 = np.array([fp + K * (1 - fs)])
