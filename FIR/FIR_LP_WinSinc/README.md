@@ -11,7 +11,6 @@ This Python script generates the coefficients for a Low Pass Finite Impulse Resp
 - `attenuation:` Desired attenuation in decibels.
 
 ```python
-Copy code
 sampling = 2000         # Sampling rate in samples/s or Hz
 cutoff = 300            # Cutoff frequency in Hz
 transition = 80         # Transition band width in Hz
@@ -20,17 +19,14 @@ attenuation = 72        # Attenuation in dB
 
 **Instantiate an LP_Filter object with the specified parameters**:
 ```python
-Copy code
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 ```
-Generate the filter coefficients using the impulse method:
+**Generate the filter coefficients using the impulse method**:
 ```python
-Copy code
 h = lowPass.impulse()
 ```
-Optionally, inspect the filter characteristics:
+**Optionally, inspect the filter characteristics**:
 ```python
-Copy code
 # Print coefficients
 for i in h:
     print(f"{i}, ")
@@ -38,12 +34,6 @@ for i in h:
 # Print filter's length and group delay
 print(f"The number of coefficients is {lowPass.length}")
 print(f"The delay of this filter is {lowPass.GroupDelay()} ms")
-```
-**Visualize the filter's impulse response and frequency response**:
-```python
-Copy code
-# Plot impulse response and window function
-lowPass.plot_response()
 ```
 
 
@@ -54,6 +44,5 @@ lowPass.plot_response()
 ### Make sure to install the dependencies using:
 
 ```bash
-Copy code
 pip install numpy matplotlib
 ```
