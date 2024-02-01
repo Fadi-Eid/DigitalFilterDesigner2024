@@ -25,7 +25,7 @@ attenuation = 72        # Attenuation in dB
 ```python
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 ```
-**Generate the filter coefficients using the impulse method:
+**Generate the filter coefficients using the impulse method**:
 
 ```python
 h = lowPass.impulse()
