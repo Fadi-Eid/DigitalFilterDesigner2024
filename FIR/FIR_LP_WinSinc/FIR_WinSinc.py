@@ -125,11 +125,12 @@ class LP_Filter(Window):
             return h
         
     # define the function that computes the delay from the filter
-    def delay(self):
+    def GroupDelay(self):
         if(self.valid == 0):
             return 0
         else:
-            return (self.M/2)/self.sampling
+            # (N-1)/2 * Fs --> x1000 for milliseconds
+            return ((self.M/2)/self.sampling)*1000
     
 
 
@@ -155,7 +156,7 @@ if(lowPass.valid == 1):
     
     # print the filter's length and group delay
     print(f"The number of coefficients is {lowPass.length}")
-    print(f"The delay of this filter is {lowPass.delay()*1000} ms")
+    print(f"The delay of this filter is {lowPass.GroupDelay()} ms")
 
     # VALIDATION code
 

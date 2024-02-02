@@ -89,11 +89,11 @@ class LP_Filter(Kaiser):
             return h*w
         else:
             return 0
-    
-    def delay(self):
+    # (N-1)/2 * Fs --> x1000 for milliseconds
+    def GroupDelay(self):
         if(self.valid==0):
             return 0
-        return ((self.N-1)/2)/self.sampling
+        return ((self.N-1)/2)/self.sampling * 1000
     
     def length(self):
         if(self.valid==0):
@@ -119,7 +119,7 @@ w = lowPass.window()
 for i in h:
     print(f"{i}, ")
 
-print(f"Delay = {lowPass.delay()}")
+print(f"Delay = {lowPass.GroupDelay()} ms")
 print(f"Coefficients = {lowPass.length()}")
 
 ###################################################################################
