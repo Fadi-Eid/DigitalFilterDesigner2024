@@ -1,5 +1,5 @@
 # DigitalFilterDesign
-## Current Version: V1.2
+## Current Version: V1.3
 
 # Introduction:
 **DigitalFilterDesign** is an open-source project dedicated to simplifying the process of digital filter design. The aim is to facilitate the creation of customizable digital filters with ease of design and implementation.
