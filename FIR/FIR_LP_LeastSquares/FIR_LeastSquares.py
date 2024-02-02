@@ -1,3 +1,11 @@
+# non-iterative Optimal (in the least-squares sense) FIR filter design
+# using the weighted least-squares method.
+# A weighting factor (K) was used to give importance to the stop-band
+# over the pass-band, ensuring high levels of attenuation (~160dB).
+
+# References:
+# New York University, Linear-phase FIR filter design by least squares
+
 import numpy as np
 from scipy.linalg import toeplitz
 from scipy.linalg import hankel
@@ -14,7 +22,7 @@ class LP_Filter():
         self.sampling = sampling
         self.fp = (cutoff-df/2)
         self.fs = (cutoff+df/2)
-        self.K = 5
+        self.K = 3
         self.N = 0
         # filter length estimation using the Fred Harris rule of thumb
         A = attenuation
@@ -73,8 +81,8 @@ class LP_Filter():
 # Filters params
 sampling = 2000     # sampling frequency in Hz
 cutoff = 300        # cutoff frequency in Hz
-df = 20             # transition band width in Hz
-A = 150             # max dB attenuation
+df = 1             # transition band width in Hz
+A = 59             # max dB attenuation
 
 
 lowPass = LP_Filter(A, df, cutoff, sampling)
@@ -105,7 +113,7 @@ plt.show()
 
 
 # Zero-padding and Compute frequency response
-n_fft = 2048*2  # Increase the resolution of the frequency bins
+n_fft = (lowPass.length())*4  # Increase the resolution of the frequency bins
 frequencies = np.fft.fftfreq(n_fft, d=1/sampling)
 magnitude_response = np.abs(np.fft.fft(h, n_fft))
 
