@@ -77,65 +77,99 @@ class LP_Filter():
         delay = (((self.N - 1)/2) / self.sampling) * 1000
         return delay
     
+    # compute the amplitude response
+    def Amplitude(self):
+        n_fft = self.N      # number of FFT points
+        Hf = np.abs(np.fft.fft(self.impulse(), n_fft))   # amplitude response
+        return Hf
+
+    def PlotImpulse(self):
+        ht = self.impulse()
+        plt.figure(1, figsize=(10, 5))
+        plt.plot(ht, label='h[n]')
+        plt.xlabel('sample')
+        plt.ylabel('amplitude')
+        plt.title('Impulse response of the designed filter')
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
     
+    def PlotAmplitudeLinear(self):
+        nfft = self.length()
+        Hf = np.abs(np.fft.fft(self.impulse(), nfft))
+        freq = np.fft.fftfreq(nfft, d=1/self.sampling)
+        # Plot magnitude response in linear scale
+        plt.figure(3, figsize=(10, 5))
+        plt.plot(freq[:nfft//2], Hf[:nfft//2], marker='o')
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Magnitude')
+        plt.title('Magnitude Response of the generated Filter (Linear Scale)')
+        plt.grid(True)
+        plt.show()
+
+    def PlotAmplitudeLog(self):
+        nfft = self.length()*4
+        Hf = np.abs(np.fft.fft(self.impulse(), nfft))
+        freq = np.fft.fftfreq(nfft, d=1/self.sampling)
+        plt.figure(2, figsize=(10, 5))
+        plt.plot(freq[:nfft//2], 20 * np.log10(Hf[:nfft//2]))
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Magnitude (dB)')
+        plt.title('Magnitude Response of the generated Filter (Logarithmic scale)')
+        plt.grid(True)
+        plt.show()
+
+    def SaveCoeffs(self):
+        fileName = 'coefficients.csv'
+        np.savetxt(fileName, self.impulse(), delimiter=',')
+
+    def PrintCoeffs(self):
+        for i in self.impulse():
+            print(f"{i}, ")
+
+    # Calculate the Mean squared error between the desired
+    # and the actual response, this can be used as a cost function
+    def MSE(self):
+        M = self.length() // 2 + 1
+        df = self.sampling / self.length()
+        actual = self.Amplitude()  # actual amplitude response
+
+        if actual is None:
+            raise ValueError("Amplitude response is None")
+        actual = actual[:M]
+
+        # create the ideal amplitude
+        number_of_ones = int(np.round(self.cutoff / df))  # Ensure integer value
+        ideal1 = np.ones(number_of_ones)
+        ideal2 = np.zeros(M - number_of_ones)
+        ideal = np.concatenate((ideal1, ideal2))
+
+        # compute the MSE
+        mse = np.mean((actual - ideal) ** 2)
+        return mse
+
+        
+
 
 ###################################################################################
 ###################################################################################
+    
+
 # USER CODE
 # Filters params
 sampling = 2000     # sampling frequency in Hz
 cutoff = 300        # cutoff frequency in Hz
-df = 1             # transition band width in Hz
-A = 59             # max dB attenuation
+df = 5            # transition band width in Hz
+A = 170             # max dB attenuation
 
 
 lowPass = LP_Filter(A, df, cutoff, sampling)
 h = lowPass.impulse()
 
-
-for i in h:
-    print(f"{i}, ")
-
-print(f"Number of coefficients = {lowPass.length()}")
-print(f"Delay = {lowPass.GroupDelay()} ms")
-
-###################################################################################
-###################################################################################
-
 # VALIDATION code
-
-# Plot impulse response
-plt.figure(1, figsize=(10, 5))
-plt.plot(h, label='h[n]', marker='o')
-plt.xlabel('sample')
-plt.ylabel('amplitude')
-plt.title('Impulse response of the designed filter')
-plt.legend()
-plt.grid(True)
-plt.tight_layout()
-plt.show()
-
-
-# Zero-padding and Compute frequency response
-n_fft = (lowPass.length())*4  # Increase the resolution of the frequency bins
-frequencies = np.fft.fftfreq(n_fft, d=1/sampling)
-magnitude_response = np.abs(np.fft.fft(h, n_fft))
-
-
-# Plot magnitude response in dB
-plt.figure(2, figsize=(10, 5))
-plt.plot(frequencies[:n_fft//2], 20 * np.log10(magnitude_response[:n_fft//2]))
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude (dB)')
-plt.title('Magnitude Response of the generated Filter (Logarithmic scale)')
-plt.grid(True)
-plt.show()
-
-# Plot magnitude response in linear scale
-plt.figure(3, figsize=(10, 5))
-plt.plot(frequencies[:n_fft//2], magnitude_response[:n_fft//2])
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude')
-plt.title('Magnitude Response of the generated Filter (Linear Scale)')
-plt.grid(True)
-plt.show()
+lowPass.SaveCoeffs()
+print(lowPass.length())
+print(lowPass.MSE())
+lowPass.PlotAmplitudeLog()
+lowPass.PlotAmplitudeLinear()
