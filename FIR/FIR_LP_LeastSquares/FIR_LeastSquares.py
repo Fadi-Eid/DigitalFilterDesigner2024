@@ -14,8 +14,6 @@ import matplotlib.pyplot as plt
 
 class LP_Filter():
     def __init__(self, attenuation, transition, cutoff, sampling):
-        # check if the input is valid
-        # pass-band and stop-band frequencies
         self.cutoff = cutoff
         self.transition = transition
         self.attenuation = attenuation
@@ -32,22 +30,22 @@ class LP_Filter():
             self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.25)
         elif A > 80 and A <= 150:
             self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.4)
-        elif A > 150:
-            if A <= 160:
-                self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.52)
-            else:
-                A = 165
-                self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.6)
+        elif A > 150 and A <= 165:
+            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.52)
+        else:
+            A = 165
+            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.6)
         
         if self.N % 2 == 0:
             self.N += 1
+
         self.M = (self.N - 1) // 2
 
         # normalize fp and fs
         self.fp = self.fp / (self.sampling / 2)
         self.fs = self.fs / (self.sampling / 2)
 
-    def impulse(self):
+    def Impulse(self):
         # construct q(k)
         x1 = np.array([self.fp + self.K * (1 - self.fs)])
         x2 = self.fp * np.sinc(self.fp * np.arange(1, 2 * self.M+1)) - self.K * self.fs * np.sinc(self.fs * np.arange(1, 2 * self.M + 1))
@@ -69,22 +67,22 @@ class LP_Filter():
 
         return h
     
-    def length(self):
+    def Length(self):
         return self.N
     
     # (N-1)/2 * Fs --> x1000 for milliseconds
-    def GroupDelay(self):
+    def Delay(self):
         delay = (((self.N - 1)/2) / self.sampling) * 1000
         return delay
     
     # compute the amplitude response
     def Amplitude(self):
         n_fft = self.N      # number of FFT points
-        Hf = np.abs(np.fft.fft(self.impulse(), n_fft))   # amplitude response
+        Hf = np.abs(np.fft.fft(self.Impulse(), n_fft))   # amplitude response
         return Hf
 
     def PlotImpulse(self):
-        ht = self.impulse()
+        ht = self.Impulse()
         plt.figure(1, figsize=(10, 5))
         plt.plot(ht, label='h[n]')
         plt.xlabel('sample')
@@ -96,21 +94,21 @@ class LP_Filter():
         plt.show()
     
     def PlotAmplitudeLinear(self):
-        nfft = self.length()
-        Hf = np.abs(np.fft.fft(self.impulse(), nfft))
+        nfft = self.Length()
+        Hf = np.abs(np.fft.fft(self.Impulse(), nfft))
         freq = np.fft.fftfreq(nfft, d=1/self.sampling)
         # Plot magnitude response in linear scale
         plt.figure(3, figsize=(10, 5))
-        plt.plot(freq[:nfft//2], Hf[:nfft//2], marker='o')
+        plt.plot(freq[:nfft//2], Hf[:nfft//2])
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Magnitude')
         plt.title('Magnitude Response of the generated Filter (Linear Scale)')
         plt.grid(True)
         plt.show()
 
-    def PlotAmplitudeLog(self):
-        nfft = self.length()*4
-        Hf = np.abs(np.fft.fft(self.impulse(), nfft))
+    def PlotAmplitudeLogarithmic(self):
+        nfft = self.Length()*4
+        Hf = np.abs(np.fft.fft(self.Impulse(), nfft))
         freq = np.fft.fftfreq(nfft, d=1/self.sampling)
         plt.figure(2, figsize=(10, 5))
         plt.plot(freq[:nfft//2], 20 * np.log10(Hf[:nfft//2]))
@@ -122,17 +120,17 @@ class LP_Filter():
 
     def SaveCoeffs(self):
         fileName = 'coefficients.csv'
-        np.savetxt(fileName, self.impulse(), delimiter=',')
+        np.savetxt(fileName, self.Impulse(), delimiter=',')
 
     def PrintCoeffs(self):
-        for i in self.impulse():
+        for i in self.Impulse():
             print(f"{i}, ")
 
     # Calculate the Mean squared error between the desired
     # and the actual response, this can be used as a cost function
     def MSE(self):
-        M = self.length() // 2 + 1
-        df = self.sampling / self.length()
+        M = self.Length() // 2 + 1
+        df = self.sampling / self.Length()
         actual = self.Amplitude()  # actual amplitude response
 
         if actual is None:
@@ -140,17 +138,13 @@ class LP_Filter():
         actual = actual[:M]
 
         # create the ideal amplitude
-        number_of_ones = int(np.round(self.cutoff / df))  # Ensure integer value
-        ideal1 = np.ones(number_of_ones)
-        ideal2 = np.zeros(M - number_of_ones)
+        cutoff_index = int(np.round(self.cutoff / df))  # Ensure integer value
+        ideal1 = np.ones(cutoff_index)
+        ideal2 = np.zeros(M - cutoff_index)
         ideal = np.concatenate((ideal1, ideal2))
-
         # compute the MSE
         mse = np.mean((actual - ideal) ** 2)
         return mse
-
-        
-
 
 ###################################################################################
 ###################################################################################
@@ -158,18 +152,32 @@ class LP_Filter():
 
 # USER CODE
 # Filters params
-sampling = 2000     # sampling frequency in Hz
-cutoff = 300        # cutoff frequency in Hz
-df = 5            # transition band width in Hz
-A = 170             # max dB attenuation
+sampling = 20000     # sampling frequency in Hz
+cutoff = 5000        # cutoff frequency in Hz
+df = 57            # transition band width in Hz
+A = 86             # max dB attenuation
 
-
+# create an instance of the filter
 lowPass = LP_Filter(A, df, cutoff, sampling)
-h = lowPass.impulse()
 
-# VALIDATION code
-lowPass.SaveCoeffs()
-print(lowPass.length())
-print(lowPass.MSE())
-lowPass.PlotAmplitudeLog()
+
+# lowPass class methods
+
+mse = lowPass.MSE()
+print(f"Error between ideal and actual filter = {mse}")
+
+N = lowPass.Length()
+print(f"Number of filter coefficients = {N}")
+
+d = lowPass.Delay()
+print(f"Delay of the filter = {d} milliseconds")
+
+h = lowPass.Impulse()
+Hf = lowPass.Amplitude()
+
+lowPass.PlotImpulse()
+lowPass.PlotAmplitudeLogarithmic()
 lowPass.PlotAmplitudeLinear()
+
+#lowPass.PrintCoeffs()
+lowPass.SaveCoeffs()
