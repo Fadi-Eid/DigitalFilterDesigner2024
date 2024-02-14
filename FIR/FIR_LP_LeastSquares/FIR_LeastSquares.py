@@ -33,8 +33,8 @@ class LP_Filter():
         elif A > 150 and A <= 165:
             self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.52)
         else:
-            A = 165
-            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.6)
+            A = 170
+            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.7)
         
         if self.N % 2 == 0:
             self.N += 1
@@ -111,7 +111,7 @@ class LP_Filter():
         Hf = np.abs(np.fft.fft(self.Impulse(), nfft))
         freq = np.fft.fftfreq(nfft, d=1/self.sampling)
         plt.figure(2, figsize=(10, 5))
-        plt.plot(freq[:nfft//2], 20 * np.log10(Hf[:nfft//2]))
+        plt.plot(freq[:nfft//2], 20 * np.log10(Hf[:nfft//2]), marker='o')
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Magnitude (dB)')
         plt.title('Magnitude Response of the generated Filter (Logarithmic scale)')
@@ -148,14 +148,14 @@ class LP_Filter():
 
 ###################################################################################
 ###################################################################################
-    
+
 
 # USER CODE
 # Filters params
 sampling = 20000     # sampling frequency in Hz
 cutoff = 5000        # cutoff frequency in Hz
-df = 57            # transition band width in Hz
-A = 86             # max dB attenuation
+df = 20            # transition band width in Hz
+A = 200             # max dB attenuation
 
 # create an instance of the filter
 lowPass = LP_Filter(A, df, cutoff, sampling)
@@ -169,15 +169,15 @@ print(f"Error between ideal and actual filter = {mse}")
 N = lowPass.Length()
 print(f"Number of filter coefficients = {N}")
 
-d = lowPass.Delay()
-print(f"Delay of the filter = {d} milliseconds")
+#d = lowPass.Delay()
+#print(f"Delay of the filter = {d} milliseconds")
 
-h = lowPass.Impulse()
-Hf = lowPass.Amplitude()
+#h = lowPass.Impulse()
+#Hf = lowPass.Amplitude()
 
-lowPass.PlotImpulse()
+#lowPass.PlotImpulse()
 lowPass.PlotAmplitudeLogarithmic()
 lowPass.PlotAmplitudeLinear()
 
 #lowPass.PrintCoeffs()
-lowPass.SaveCoeffs()
+#lowPass.SaveCoeffs()

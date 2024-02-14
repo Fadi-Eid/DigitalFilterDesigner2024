@@ -4,7 +4,7 @@
 
 import math
 import numpy as np
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 
 class Kaiser:
@@ -126,18 +126,25 @@ print(f"Coefficients = {lowPass.length()}")
 ###################################################################################
 
 # VALIDATION code
-
-# Plot impulse response
-plt.figure(1, figsize=(10, 5))
-plt.plot(h, label='h[n]', marker='o')
-plt.plot(w, label='w[n]', marker='o')
-plt.xlabel('sample')
-plt.ylabel('amplitude')
-plt.title('Impulse response of the designed filter')
-plt.legend()
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+fig1 = go.Figure()
+fig1.add_trace(go.Scatter(y=h,
+                         mode='lines', name='h(n)',
+                         line=dict(color='blue', width=3)))
+fig1.add_trace(go.Scatter(y=w,
+                         mode='lines', name='w(n)',
+                         line=dict(color='red', width=2, dash='dash')))
+fig1.update_layout(title='Impulse response of the generated filter + window',
+                  xaxis_title='Sample',
+                  yaxis_title='Value',
+                  xaxis_type='linear',
+                  xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+                  font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
+                  legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
+                  plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+                  paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
+                  margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
+                  )
+fig1.show()
 
 
 # Zero-padding and Compute frequency response
@@ -145,21 +152,37 @@ n_fft = 2048  # Increase the resolution of the frequency bins
 frequencies = np.fft.fftfreq(n_fft, d=1/sampling)
 magnitude_response = np.abs(np.fft.fft(h, n_fft))
 
+fig2 = go.Figure()
+fig2.add_trace(go.Scatter(x=frequencies[:n_fft//2], y=20 * np.log10(magnitude_response[:n_fft//2]),
+                         mode='lines', name='H(f)',
+                         line=dict(color='magenta', width=3)))
+fig2.update_layout(title='Magnitude Response of the generated Filter (Logarithmic scale)',
+                  xaxis_title='frequency (Hz)',
+                  yaxis_title='Amplitude (dB)',
+                  xaxis_type='linear',
+                  xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+                  font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
+                  legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
+                  plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+                  paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
+                  margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
+                  )
+fig2.show()
 
-# Plot magnitude response in dB
-plt.figure(2, figsize=(10, 5))
-plt.plot(frequencies[:n_fft//2], 20 * np.log10(magnitude_response[:n_fft//2]))
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude (dB)')
-plt.title('Magnitude Response of the generated Filter (Logarithmic scale)')
-plt.grid(True)
-plt.show()
 
-# Plot magnitude response in linear scale
-plt.figure(3, figsize=(10, 5))
-plt.plot(frequencies[:n_fft//2], magnitude_response[:n_fft//2])
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude')
-plt.title('Magnitude Response of the generated Filter (Linear Scale)')
-plt.grid(True)
-plt.show()
+fig3 = go.Figure()
+fig3.add_trace(go.Scatter(x=frequencies[:n_fft//2], y=magnitude_response[:n_fft//2],
+                         mode='lines', name='H(f)',
+                         line=dict(color='blue', width=3)))
+fig3.update_layout(title='Magnitude Response of the generated Filter (Logarithmic scale)',
+                  xaxis_title='frequency (Hz)',
+                  yaxis_title='Amplitude (Gain)',
+                  xaxis_type='linear',
+                  xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+                  font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
+                  legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
+                  plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+                  paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
+                  margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
+                  )
+fig3.show()
