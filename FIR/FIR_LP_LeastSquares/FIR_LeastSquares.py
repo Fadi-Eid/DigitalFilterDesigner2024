@@ -9,7 +9,7 @@
 import numpy as np
 from scipy.linalg import toeplitz
 from scipy.linalg import hankel
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 
 class LP_Filter():
@@ -83,40 +83,66 @@ class LP_Filter():
 
     def PlotImpulse(self):
         ht = self.Impulse()
-        plt.figure(1, figsize=(10, 5))
-        plt.plot(ht, label='h[n]')
-        plt.xlabel('sample')
-        plt.ylabel('amplitude')
-        plt.title('Impulse response of the designed filter')
-        plt.legend()
-        plt.grid(True)
-        plt.tight_layout()
-        plt.show()
+        fig1 = go.Figure()
+        fig1.add_trace(go.Scatter(y=ht,
+                         mode='lines', name='h(n)',
+                         line=dict(color='green', width=3)))
+        fig1.update_layout(title='Impulse response of the generated filter',
+                  xaxis_title='Sample',
+                  yaxis_title='Value',
+                  xaxis_type='linear',
+                  xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+                  font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
+                  legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
+                  plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+                  paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
+                  margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
+                  )
+        fig1.show()
     
     def PlotAmplitudeLinear(self):
         nfft = self.Length()
         Hf = np.abs(np.fft.fft(self.Impulse(), nfft))
         freq = np.fft.fftfreq(nfft, d=1/self.sampling)
-        # Plot magnitude response in linear scale
-        plt.figure(3, figsize=(10, 5))
-        plt.plot(freq[:nfft//2], Hf[:nfft//2])
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Magnitude')
-        plt.title('Magnitude Response of the generated Filter (Linear Scale)')
-        plt.grid(True)
-        plt.show()
+
+        fig2 = go.Figure()
+        fig2.add_trace(go.Scatter(x=freq[:nfft//2], y=Hf[:nfft//2],
+                         mode='lines', name='H(f)',
+                         line=dict(color='violet', width=3)))
+        fig2.update_layout(title='Amplitude response of the generated filter',
+                  xaxis_title='Frequency (Hz)',
+                  yaxis_title='Amplitude (Gain)',
+                  xaxis_type='linear',
+                  xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+                  font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
+                  legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
+                  plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+                  paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
+                  margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
+                  )
+        fig2.show()
 
     def PlotAmplitudeLogarithmic(self):
         nfft = self.Length()*4
         Hf = np.abs(np.fft.fft(self.Impulse(), nfft))
         freq = np.fft.fftfreq(nfft, d=1/self.sampling)
-        plt.figure(2, figsize=(10, 5))
-        plt.plot(freq[:nfft//2], 20 * np.log10(Hf[:nfft//2]), marker='o')
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Magnitude (dB)')
-        plt.title('Magnitude Response of the generated Filter (Logarithmic scale)')
-        plt.grid(True)
-        plt.show()
+
+        fig3 = go.Figure()
+        fig3.add_trace(go.Scatter(x=freq[:nfft//2], y=20 * np.log10(Hf[:nfft//2]),
+                         mode='lines', name='H(f)',
+                         line=dict(color='red', width=3)))
+        fig3.update_layout(title='Amplitude response of the generated filter',
+                  xaxis_title='Frequency (Hz)',
+                  yaxis_title='Amplitude (dB)',
+                  xaxis_type='linear',
+                  xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+                  font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
+                  legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
+                  plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+                  paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
+                  margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
+                  )
+        fig3.show()
 
     def SaveCoeffs(self):
         fileName = 'coefficients.csv'
@@ -154,30 +180,22 @@ class LP_Filter():
 # Filters params
 sampling = 20000     # sampling frequency in Hz
 cutoff = 5000        # cutoff frequency in Hz
-df = 20            # transition band width in Hz
-A = 200             # max dB attenuation
+df = 79              # transition band width in Hz
+A = 82               # max dB attenuation
 
 # create an instance of the filter
 lowPass = LP_Filter(A, df, cutoff, sampling)
 
 
 # lowPass class methods
+mse = lowPass.MSE()     # returns the mean-squared error between
+                        # generated filter and the desired filter
+N = lowPass.Length()    # return the filter length
+D = lowPass.Delay()     # return the delay caused by the filter in ms
 
-mse = lowPass.MSE()
-print(f"Error between ideal and actual filter = {mse}")
+lowPass.PlotImpulse()               # time-domain impulse response
+lowPass.PlotAmplitudeLinear()       # linear, frequency-domain amplitude response
+lowPass.PlotAmplitudeLogarithmic()  # logarithmic, frequency-domain amplitude response
 
-N = lowPass.Length()
-print(f"Number of filter coefficients = {N}")
-
-#d = lowPass.Delay()
-#print(f"Delay of the filter = {d} milliseconds")
-
-#h = lowPass.Impulse()
-#Hf = lowPass.Amplitude()
-
-#lowPass.PlotImpulse()
-lowPass.PlotAmplitudeLogarithmic()
-lowPass.PlotAmplitudeLinear()
-
-#lowPass.PrintCoeffs()
-#lowPass.SaveCoeffs()
+#lowPass.PrintCoeffs()   # print the generated coefficients to the terminal
+lowPass.SaveCoeffs()    # save the coefficients in a .csv file (coefficients.csv)

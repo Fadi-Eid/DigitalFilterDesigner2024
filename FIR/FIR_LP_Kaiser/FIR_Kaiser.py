@@ -103,6 +103,7 @@ class LP_Filter(Kaiser):
 
 ###################################################################################
 ###################################################################################
+    
 # USER CODE
 
 # user defined variables
@@ -116,14 +117,13 @@ lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 h = lowPass.impulse()
 w = lowPass.window()
 
-for i in h:
-    print(f"{i}, ")
-
 print(f"Delay = {lowPass.GroupDelay()} ms")
 print(f"Coefficients = {lowPass.length()}")
 
 ###################################################################################
 ###################################################################################
+
+
 
 # VALIDATION code
 fig1 = go.Figure()
