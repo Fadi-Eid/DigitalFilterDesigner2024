@@ -235,6 +235,4 @@ def main(page: ft.Page):
     page.add(left_panel, right_panel)
 
 ft.app(target=main, assets_dir="assets")
-
-
           
