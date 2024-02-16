@@ -145,7 +145,7 @@ class LP_Filter():
         fig3.show()
 
     def SaveCoeffs(self):
-        fileName = 'coefficients.csv'
+        fileName = './App/coefficients.csv'
         np.savetxt(fileName, self.Impulse(), delimiter=',')
 
     def PrintCoeffs(self):
@@ -171,31 +171,3 @@ class LP_Filter():
         # compute the MSE
         mse = np.mean((actual - ideal) ** 2)
         return mse
-
-###################################################################################
-###################################################################################
-
-
-# USER CODE
-# Filters params
-sampling = 20000     # sampling frequency in Hz
-cutoff = 5000        # cutoff frequency in Hz
-df = 79              # transition band width in Hz
-A = 82               # max dB attenuation
-
-# create an instance of the filter
-lowPass = LP_Filter(A, df, cutoff, sampling)
-
-
-# lowPass class methods
-mse = lowPass.MSE()     # returns the mean-squared error between
-                        # generated filter and the desired filter
-N = lowPass.Length()    # return the filter length
-D = lowPass.Delay()     # return the delay caused by the filter in ms
-
-lowPass.PlotImpulse()               # time-domain impulse response
-lowPass.PlotAmplitudeLinear()       # linear, frequency-domain amplitude response
-lowPass.PlotAmplitudeLogarithmic()  # logarithmic, frequency-domain amplitude response
-
-#lowPass.PrintCoeffs()   # print the generated coefficients to the terminal
-lowPass.SaveCoeffs()    # save the coefficients in a .csv file (coefficients.csv)
