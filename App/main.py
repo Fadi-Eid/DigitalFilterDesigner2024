@@ -17,7 +17,7 @@ class Parameter(ft.UserControl):
         ))
 
     def build(self):
-        self.param_unit = ft.Text(self.box_unit)
+        self.param_unit = ft.Text(self.box_unit, weight=ft.FontWeight.BOLD)
 
         self.view = ft.Row(expand=1,
                         controls=[
@@ -188,9 +188,9 @@ def main(page: ft.Page):
     # Create the right panel image
     img = ft.Image(
         src=f"./App/help.png",
-        width=350,
+        width=430,
         height=400,
-        fit=ft.ImageFit.CONTAIN,
+        #fit=ft.ImageFit.CONTAIN,
     )
 
     delay_box = ft.Text("Filter delay:  ", theme_style=ft.TextThemeStyle.HEADLINE_SMALL)
