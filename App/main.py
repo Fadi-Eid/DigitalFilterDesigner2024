@@ -44,8 +44,10 @@ class Parameter(ft.UserControl):
 def main(page: ft.Page):
     page.title = "Digital Filter Designer 2024"
     page.theme_mode = "light"
-    page.window_width = 710        # window's width is 200 px
-    page.window_height = 680       # window's height is 200 px
+    page.theme = ft.Theme(color_scheme_seed="red")
+    
+    page.window_width = 620        # window's width is 200 px
+    page.window_height = 700       # window's height is 200 px
     #page.window_resizable = False  # window is not resizable
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.update()
@@ -56,7 +58,10 @@ def main(page: ft.Page):
             else:
                 page.theme_mode = "dark"
             page.update()
-        
+        if (e.ctrl == True) and (e.key == "d" or e.key == "D"):
+            clear_shortcut()
+        if (e.ctrl == True) and (e.key == "h" or e.key == "H"):
+            open_repo()
     
     page.on_keyboard_event = on_keyboard
 
@@ -172,15 +177,25 @@ def main(page: ft.Page):
         delay.value = "0.0 ms"
         length.value = "0"
         page.update()
-
         
+    def clear_shortcut():
+        cutoff_input.clean_all()
+        sampling_input.clean_all()
+        transition_input.clean_all()
+        attenuation_input.clean_all()
+        delay.value = "0.0 ms"
+        length.value = "0"
+        page.update()
+
+    def open_repo():
+        page.launch_url('https://github.com/Fadi-Eid/DigitalFilterDesign')  
 
 
     design_btn = ft.ElevatedButton(text="Generate filter", on_click=generate)
     validate_btn = ft.ElevatedButton(text="Validate filter", on_click=validate)
     clear_btn = ft.ElevatedButton(text="Clear input", on_click=clear)
 
-    buttons = ft.Row(controls=[
+    buttons = ft.Row(spacing=20, alignment=ft.MainAxisAlignment.CENTER, controls=[
         design_btn, validate_btn, clear_btn
     ])
 
@@ -188,7 +203,7 @@ def main(page: ft.Page):
 
     # Create the right panel image
     img = ft.Image(
-        src=f"./App/help2.jpg",
+        src=f"./App/assets/help2.png",
         width=350,
         height=350,
         repeat=ft.ImageRepeat.NO_REPEAT,
@@ -196,8 +211,10 @@ def main(page: ft.Page):
         #fit=ft.ImageFit.CONTAIN,
     )
 
-    delay_box = ft.Text("Filter delay", theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM, weight=ft.FontWeight.BOLD)
-    length_box = ft.Text("Filter length", theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM, weight=ft.FontWeight.BOLD)
+    delay_box = ft.Text("Filter delay", theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM,
+                        font_family="Tahoma")
+    length_box = ft.Text("Filter length", theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM,
+                         font_family="Tahoma")
     delay = ft.Text("0.0 ms", theme_style=ft.TextThemeStyle.HEADLINE_SMALL)
     length = ft.Text("0", theme_style=ft.TextThemeStyle.HEADLINE_SMALL)
 
@@ -207,15 +224,15 @@ def main(page: ft.Page):
     length_disp = ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                             spacing=5,
                             controls=[length_box, length])
-    info_disp = ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
+    info_disp = ft.Column(expand=1, horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
                           spacing=7,
                           controls=[delay_disp, length_disp])
 
-    right_panel = ft.Row(spacing=100, controls=[img, info_disp])
+    right_panel = ft.Row( width=page.window_width, controls=[img, info_disp])
 
     page.add(left_panel, right_panel)
 
-ft.app(target=main)
+ft.app(target=main, assets_dir="assets")
 
 
           
