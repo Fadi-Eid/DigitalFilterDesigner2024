@@ -19,19 +19,30 @@ For the validation of any generated filter, the provided Python code will diplay
 
 
 # Usage
+### Create filter instance
 ```python
-# Example Usage
 sampling = 2000
 cutoff = 500
 transition = 50
 attenuation = 30
 
 lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
-
+```
+## Main methods:
+### Save the filter coefficients (coefficients.csv)
+```python
+lowPass.SaveCoeffs((
+```
+### Validation plots
+```python
+lowPass.PlotImpulse()
+lowPass.PlotAmplitudeLinear()
+lowPass.PlotAmplitudeLog()
+```
 h = lowPass.impulse()
 N = lowPass.length()
 D = lowPass.GroupDelay()
-```
+
 
 
 # Validation Guide
