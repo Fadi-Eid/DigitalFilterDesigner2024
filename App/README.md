@@ -1,4 +1,4 @@
-# Introduction
+# How to Use
 ### GUI Features:
 1. **Shortcuts**: Many shortcuts are available to facilitate the use of the software.
 * **CTRL + D**: Deletes all the values in the input fields
