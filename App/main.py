@@ -115,7 +115,7 @@ def main(page: ft.Page):
             filter = FIR.LP_Filter(attenuation, transition, cutoff, sampling)
             filter.SaveCoeffs()
             dlg = ft.AlertDialog(
-                    title=ft.Text("Coefficients generated\ncoefficients.csv"), on_dismiss=lambda e: print("Dialog dismissed!")
+                    title=ft.Text("Coefficients generated\ncoefficients.csv")
                 )
             page.dialog = dlg
             dlg.open = True
@@ -126,7 +126,8 @@ def main(page: ft.Page):
             length.value = ""
             page.update()
             dlg = ft.AlertDialog(
-                    title=ft.Text("Failed:\nput fields cannot be empty"), on_dismiss=lambda e: print("Dialog dismissed!")
+                    title=ft.Text("Input fields cannot be empty"),
+                    icon=ft.Icon(name="warning")
                 )
             page.dialog = dlg
             dlg.open = True
@@ -163,7 +164,8 @@ def main(page: ft.Page):
             length.value = ""
             page.update()
             dlg = ft.AlertDialog(
-                    title=ft.Text("Failed:\nput fields cannot be empty"), on_dismiss=lambda e: print("Dialog dismissed!")
+                    title=ft.Text("Input fields cannot be empty"),
+                    icon=ft.Icon(name="warning")
                 )
             page.dialog = dlg
             dlg.open = True
