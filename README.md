@@ -1,10 +1,12 @@
 # DigitalFilterDesign
-## Current Version: V1.3
+## Current Version: V1.4
 
 # Introduction:
 **DigitalFilterDesign** is an open-source project dedicated to simplifying the process of digital filter design. The aim is to facilitate the creation of customizable digital filters with ease of design and implementation.
 
 The current version offers Python code for the automatic design of FIR low-pass filters using three methods: the __**windowed-sinc method**__, the __**Kaiser adjustable**__ window method and the __**weighted least-squares**__ method. The algorithms are written in Python, allowing users to generate filter coefficients by adjusting parameters. After filter generation, the frequency domain magnitude response (linear and logarithmic) is displayed alongside the time domain impulse response for validation.
+
+The Least-Squares method, which is the most performant method, is available in GUI form.
 
 Additionally, a MATLAB code is provided for further analysis (optional validation).
 
@@ -13,7 +15,7 @@ Additionally, a MATLAB code is provided for further analysis (optional validatio
 
 1. **FIR**: Contains algorithms and methods for linear phase finite impulse response filter design.
 2. **IIR**: Contains algorithms and methods for recursive infinite impulse response filter design.
-3. **App**: Desktop app presenting a user-friendly, code-less interface for FIR and IIR filter design.
+3. **App**: Desktop app presenting a user-friendly, code-less interface for FIR design (Least-Squares method).
 
 > Each folder includes a README providing detailed documentation and guidance
 
@@ -22,37 +24,27 @@ In addition to optimization, improvements, and bug fixes, upcoming releases are 
 
 * **V1.1** : Low-pass FIR design using the windowed-sinc method.
 * **V1.2**:  Low-pass FIR design using the Kaiser adjustable window.
-* **V1.3** __(Current)__: Optimal FIR filter design API using the Least-Squares method.
-* **V1.3.1** __(Under Dev)__: Optimal FIR filter design API using Least-Squares method with an optimization algorithm
-* **V1.4** : Optimal FIR filter design API using the Parks-McClellan iterative method.
+* **V1.3**: Optimal FIR filter design API using the Least-Squares method.
+* **V1.4** __(Current)__: GUI for FIR filter generation using the Least-Squares method.
+* **V1.5** : Optimal FIR filter design API using the Parks-McClellan iterative method.
 * **V2.0**: IIR filter design.
 * **V2.1**: __(No specific plans outlined yet)__
-* **V3.0**: Implementation of a desktop interface (App).
+* **V3.0**: Implementation of the complete desktop interface (App).
 
 # Screenshots
 
-![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/47dd7aa2-c482-4456-8fc5-9588eda2c7f0)
-
-
-![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/c509c3c2-cb83-4b7f-a376-1c0dd488250d)
-
-
-![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/cd60461d-5fd3-475d-a226-22444c45621a)
-
-
-![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/93b0e024-7970-491a-8212-80c7e92e4fec)
-
-
-![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/105ff033-28e8-4d6b-9ba5-b97a18f4575e)
-
-
-![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/48ef345d-554e-4d2c-b9d0-17c67c6e72f0)
-
-
-![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/e2f0e795-abf5-4d55-b921-5fddb3c3f860)
+![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/0a990d04-e96a-4c20-b4c4-01e17451362c)
 
 
 
+![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/4c61a98b-3fa5-4030-b146-67e3712b45cf)
 
+
+
+![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/7051e0f1-b517-453f-8b1c-e8f48ba44d91)
+
+
+
+![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/b1b66916-b96e-47c0-acf2-c619b1fb0ec9)
 
 
