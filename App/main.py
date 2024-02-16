@@ -56,6 +56,7 @@ def main(page: ft.Page):
             else:
                 page.theme_mode = "dark"
             page.update()
+        
     
     page.on_keyboard_event = on_keyboard
 
@@ -168,8 +169,8 @@ def main(page: ft.Page):
         sampling_input.clean_all()
         transition_input.clean_all()
         attenuation_input.clean_all()
-        delay.value = ""
-        length.value = ""
+        delay.value = "0.0 ms"
+        length.value = "0"
         page.update()
 
         
@@ -187,22 +188,30 @@ def main(page: ft.Page):
 
     # Create the right panel image
     img = ft.Image(
-        src=f"./App/help.png",
-        width=430,
-        height=400,
+        src=f"./App/help2.jpg",
+        width=350,
+        height=350,
+        repeat=ft.ImageRepeat.NO_REPEAT,
+        border_radius=ft.border_radius.all(10)
         #fit=ft.ImageFit.CONTAIN,
     )
 
-    delay_box = ft.Text("Filter delay:  ", theme_style=ft.TextThemeStyle.HEADLINE_SMALL)
-    length_box = ft.Text("Filter length: ", theme_style=ft.TextThemeStyle.HEADLINE_SMALL)
-    delay = ft.Text("", theme_style=ft.TextThemeStyle.HEADLINE_SMALL)
-    length = ft.Text("", theme_style=ft.TextThemeStyle.HEADLINE_SMALL)
+    delay_box = ft.Text("Filter delay", theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM, weight=ft.FontWeight.BOLD)
+    length_box = ft.Text("Filter length", theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM, weight=ft.FontWeight.BOLD)
+    delay = ft.Text("0.0 ms", theme_style=ft.TextThemeStyle.HEADLINE_SMALL)
+    length = ft.Text("0", theme_style=ft.TextThemeStyle.HEADLINE_SMALL)
 
-    delay_disp = ft.Row(controls=[delay_box, delay])
-    length_disp = ft.Row(controls=[length_box, length])
-    info_disp = ft.Column(controls=[delay_disp, length_disp])
+    delay_disp = ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
+                           spacing=5,
+                           controls=[delay_box, delay])
+    length_disp = ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                            spacing=5,
+                            controls=[length_box, length])
+    info_disp = ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
+                          spacing=7,
+                          controls=[delay_disp, length_disp])
 
-    right_panel = ft.Row(controls=[img, info_disp])
+    right_panel = ft.Row(spacing=100, controls=[img, info_disp])
 
     page.add(left_panel, right_panel)
 
