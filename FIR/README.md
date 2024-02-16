@@ -31,7 +31,7 @@ lowPass = LP_Filter(attenuation, transition, cutoff, sampling)
 ## Main methods:
 ### Save the filter coefficients (coefficients.csv)
 ```python
-lowPass.SaveCoeffs((
+lowPass.SaveCoeffs()
 ```
 ### Validation plots
 ```python
@@ -39,11 +39,13 @@ lowPass.PlotImpulse()
 lowPass.PlotAmplitudeLinear()
 lowPass.PlotAmplitudeLog()
 ```
-h = lowPass.impulse()
-N = lowPass.length()
-D = lowPass.GroupDelay()
 
-
+### Useful data about filter
+```python
+lowPass.Length()
+lowPass.Delay()
+lowPass.MSE()
+```
 
 # Validation Guide
 The generated Python plots can be used to validate the generated filters.
