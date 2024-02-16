@@ -21,4 +21,9 @@ For the validation of any generated filter, the provided Python code will diplay
 1. **Impulse response + window function**: This plot can be used to visually check the shape of the window function and the sinc shaped impulse response.
 1. **Magnitude response (Logarithmic)**: This plot is the most important plot, and should be used to check for the validity of the designed filter by checking the peak amplitude of the first lobe in the stop-band
 1. **Magnitude response (Linear)**: This plot can be used to visually check the overall shape of thefrequency response of the filter, the ripple in the pass-band and stop-band, and most importantly, to validate the transition band width.
-> The validation process will be outlined later in this document.
+
+
+
+
+
+![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/0df91bc5-6b6b-4194-a81a-8c6dace6d628)
