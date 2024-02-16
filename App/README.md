@@ -1,17 +1,28 @@
 # How to Use
+### Instalation
+Before using the GUI make sure that you have python 3.8 and above installed on your machine, after that, open the terminal and install the modules:
+```bash
+pip install numpy
+pip install plotly
+pip install flet
+pip install scipy
+```
+
 ### GUI Features:
 1. **Shortcuts**: Many shortcuts are available to facilitate the use of the software.
 * **CTRL + D**: Deletes all the values in the input fields
 * **CTRL + T**: Toggles between light and dark mode
 * **TAB**: Moves focus to the next input field or button
 * **CTRL + H**: Opens the documentation in the browser
+* **CTRL + N**: Fills the input fields with default values
 
 2. __**Filter Validation**__: After the input fields are all specified, the filter can be validated using the validate button, which open three interactive plots in the browser.
 The first plot is the impulse response of the generated filter, the second is the linear plot of the amplitude response, and the third plot is the logarithmic plot of the amplitude response.
+The generated plots are responsive, meaning that zooming in is possible by left clicking and draging to select desired area, zooming out can be achieved by double-clicking, and hovering over the plot will show the values (x and y).
 
-3. __**Filter Generation**__: Clicking the generate button will create a .csv file in the same directory of the cloned repo, called coefficients.csv that contains the coefficients of the FIR filter.
+4. __**Filter Generation**__: Clicking the generate button will create a .csv file in the specified directory. The file is called coefficients.csv and contains the coefficients of the FIR filter.
 
-4. __**Filter data**__: After validation and/or generation, the filter length and the delay cause by the filter are displayed on the right side on the form.
+5. __**Filter data**__: After validation and/or generation, the filter length and the delay caused by the filter are displayed on the right side on the form.
 
 
 
