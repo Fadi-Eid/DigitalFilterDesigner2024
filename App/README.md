@@ -38,3 +38,7 @@ For the validation of any generated filter, the provided Python code will diplay
 
 
 ![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/0df91bc5-6b6b-4194-a81a-8c6dace6d628)
+
+
+# Video demo
+[YouTube](https://youtu.be/WzR1Gm4fmk0)
