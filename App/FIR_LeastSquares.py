@@ -146,7 +146,10 @@ class LP_Filter():
 
     def SaveCoeffs(self, path):
         fileName = f"{path}/coefficients.csv"
-        np.savetxt(fileName, self.Impulse(), delimiter=',')
+        if fileName == "":
+            np.savetxt("./coefficients.csv", self.Impulse(), delimiter=',')
+        else:
+            np.savetxt(fileName, self.Impulse(), delimiter=',')
 
     def PrintCoeffs(self):
         for i in self.Impulse():
