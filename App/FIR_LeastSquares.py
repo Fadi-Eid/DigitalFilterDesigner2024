@@ -144,8 +144,8 @@ class LP_Filter():
                   )
         fig3.show()
 
-    def SaveCoeffs(self):
-        fileName = './coefficients.csv'
+    def SaveCoeffs(self, path):
+        fileName = f"{path}/coefficients.csv"
         np.savetxt(fileName, self.Impulse(), delimiter=',')
 
     def PrintCoeffs(self):

@@ -1,5 +1,6 @@
 import flet as ft
 import FIR_LeastSquares as FIR
+import time
 
 
 class Parameter(ft.UserControl):
@@ -9,7 +10,7 @@ class Parameter(ft.UserControl):
         self.box_default = box_default
         self.box_unit = box_unit
 
-        self.param_box = ft.TextField(expand=1, label=self.box_name, hint_text=self.box_default,
+        self.param_box = ft.TextField(expand=1, label=self.box_name, hint_text=f"e.g., {self.box_default}",
                                       input_filter=ft.InputFilter(
             regex_string=r"[0-9]",
             allow=True,
@@ -38,6 +39,10 @@ class Parameter(ft.UserControl):
         self.param_box.value = ""
         self.update()
 
+    def set_to_default(self):
+        self.param_box.value = self.box_default
+        self.update()
+
 
 
 
@@ -62,13 +67,19 @@ def main(page: ft.Page):
             clear_shortcut()
         if (e.ctrl == True) and (e.key == "h" or e.key == "H"):
             open_repo()
+        if (e.ctrl == True) and (e.key == "n" or e.key == "N"):
+            sampling_input.set_to_default()
+            transition_input.set_to_default()
+            cutoff_input.set_to_default()
+            attenuation_input.set_to_default()
+            
     
     page.on_keyboard_event = on_keyboard
 
-    sampling_input = Parameter("Sampling frequency", "e.g., 2000", "Hz")
-    cutoff_input = Parameter("Cutoff frequency", "e.g., 389", "Hz")
-    transition_input = Parameter("Transition width", "e.g., 20", "Hz")
-    attenuation_input = Parameter("Stop Band Attenuation", "e.g., 90", "dB")
+    sampling_input = Parameter("Sampling frequency", "2000", "Hz")
+    cutoff_input = Parameter("Cutoff frequency", "400", "Hz")
+    transition_input = Parameter("Transition width", "20", "Hz")
+    attenuation_input = Parameter("Stop Band Attenuation", "57", "dB")
 
     parameter_section = ft.Column(
         controls=[
@@ -89,39 +100,45 @@ def main(page: ft.Page):
         length.value = l
         page.update()
 
+    def generate_and_save_filter(e: ft.FilePickerResultEvent):
+        sampling = sampling_input.value()
+        cutoff = cutoff_input.value()
+        attenuation = attenuation_input.value()
+        transition = transition_input.value()
+        page.splash = ft.ProgressBar()
+        design_btn.disabled = True
+        validate_btn.disabled = True
+        clear_btn.disabled = True
+        page.update()
+        time.sleep(2)
+        page.splash = None
+        design_btn.disabled = False
+        validate_btn.disabled = False
+        clear_btn.disabled = False
+        page.update()
+        filter = FIR.LP_Filter(attenuation, transition, cutoff, sampling)
 
-
+        filter.SaveCoeffs(e.path)
+        dlg = ft.AlertDialog(
+                title=ft.Text("Coefficients generated")
+            )
+        page.dialog = dlg
+        dlg.open = True
+        page.update()
+        display_info_true()
+        
 
     def generate(e):
         valid = 1
-        if(sampling_input.value() != ""):
-            sampling = sampling_input.value()
-        else:
+        if(sampling_input.value() == ""):
             valid = 0
-        if(transition_input.value()!= ""):
-            transition = transition_input.value()
-        else:
+        if(cutoff_input.value() == ""):
             valid = 0
-        if(cutoff_input.value()!=""):
-            cutoff = cutoff_input.value()
-        else:
+        if(attenuation_input.value() == ""):
             valid = 0
-        if(attenuation_input.value()!=""):
-            attenuation = attenuation_input.value()
-        else:
+        if(transition_input.value() == ""):
             valid = 0
-
-        if(valid == 1):
-            filter = FIR.LP_Filter(attenuation, transition, cutoff, sampling)
-            filter.SaveCoeffs()
-            dlg = ft.AlertDialog(
-                    title=ft.Text("Coefficients generated\ncoefficients.csv")
-                )
-            page.dialog = dlg
-            dlg.open = True
-            page.update()
-            display_info_true()
-        else:
+        if valid == 0:
             delay.value = ""
             length.value = ""
             page.update()
@@ -132,6 +149,11 @@ def main(page: ft.Page):
             page.dialog = dlg
             dlg.open = True
             page.update()
+        else:
+            file_picker = ft.FilePicker(on_result=generate_and_save_filter)
+            page.overlay.append(file_picker)
+            page.update()
+            file_picker.get_directory_path()
 
         
     def validate(e):
@@ -154,6 +176,17 @@ def main(page: ft.Page):
             valid = 0
         
         if(valid == 1):
+            page.splash = ft.ProgressBar()
+            design_btn.disabled = True
+            validate_btn.disabled = True
+            clear_btn.disabled = True
+            page.update()
+            time.sleep(2)
+            page.splash = None
+            design_btn.disabled = False
+            validate_btn.disabled = False
+            clear_btn.disabled = False
+            page.update()
             filter = FIR.LP_Filter(attenuation, transition, cutoff, sampling)
             filter.PlotAmplitudeLinear()
             filter.PlotAmplitudeLogarithmic()
@@ -206,10 +239,10 @@ def main(page: ft.Page):
     # Create the right panel image
     img = ft.Image(
         src=f"./App/assets/help2.png",
-        width=350,
-        height=350,
+        width=320,
+        height=320,
         repeat=ft.ImageRepeat.NO_REPEAT,
-        border_radius=ft.border_radius.all(10)
+        border_radius=ft.border_radius.all(5)
         #fit=ft.ImageFit.CONTAIN,
     )
 
