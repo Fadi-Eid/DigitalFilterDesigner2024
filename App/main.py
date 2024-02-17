@@ -43,13 +43,17 @@ class Parameter(ft.UserControl):
         self.param_box.value = self.box_default
         self.update()
 
+    def error(self, message):
+        self.param_box.error_text = message
+        self.update()
+
 
 
 
 def main(page: ft.Page):
     page.title = "Digital Filter Designer 2024"
     page.theme_mode = "light"
-    page.theme = ft.Theme(color_scheme_seed="red")
+    page.theme = ft.Theme(color_scheme_seed="blue")
     
     page.window_width = 620        # window's width is 200 px
     page.window_height = 700       # window's height is 200 px
@@ -120,7 +124,9 @@ def main(page: ft.Page):
 
         filter.SaveCoeffs(e.path)
         dlg = ft.AlertDialog(
-                title=ft.Text("Coefficients generated")
+                icon=ft.Icon(name="Done"),
+                title=ft.Text("Coefficients generated"),
+                bgcolor=ft.colors.GREEN_200
             )
         page.dialog = dlg
         dlg.open = True
@@ -131,51 +137,74 @@ def main(page: ft.Page):
     def generate(e):
         valid = 1
         if(sampling_input.value() == ""):
+            sampling_input.error("value required")
             valid = 0
-        if(cutoff_input.value() == ""):
-            valid = 0
-        if(attenuation_input.value() == ""):
-            valid = 0
-        if(transition_input.value() == ""):
-            valid = 0
-        if valid == 0:
-            delay.value = ""
-            length.value = ""
-            page.update()
-            dlg = ft.AlertDialog(
-                    title=ft.Text("Input fields cannot be empty"),
-                    icon=ft.Icon(name="warning")
-                )
-            page.dialog = dlg
-            dlg.open = True
-            page.update()
         else:
+            sampling_input.error("")
+        if(cutoff_input.value() == ""):
+            cutoff_input.error("value required")
+            valid = 0
+        else:
+            cutoff_input.error("")
+        if(attenuation_input.value() == ""):
+            attenuation_input.error("value required")
+            valid = 0
+        else:
+            attenuation_input.error("")
+        if(transition_input.value() == ""):
+            transition_input.error("value required")
+            valid = 0
+        else:
+            transition_input.error("value required")
+        
+        if valid == 1:
+            sampling_input.error("")
+            cutoff_input.error("")
+            attenuation_input.error("")
+            transition_input.error("")
             file_picker = ft.FilePicker(on_result=generate_and_save_filter)
             page.overlay.append(file_picker)
             page.update()
             file_picker.get_directory_path()
+        
+        else:
+            delay.value = ""
+            length.value = ""
+            page.update()
 
         
     def validate(e):
         valid = 1
         if(sampling_input.value() != ""):
+            sampling_input.error("")
             sampling = sampling_input.value()
         else:
+            sampling_input.error("value required")
             valid = 0
         if(transition_input.value()!= ""):
+            transition_input.error("")
             transition = transition_input.value()
         else:
+            transition_input.error("value required")
             valid = 0
         if(cutoff_input.value()!=""):
+            cutoff_input.error("")
             cutoff = cutoff_input.value()
         else:
+            cutoff_input.error("value required")
             valid = 0
         if(attenuation_input.value()!=""):
+            attenuation_input.error("")
             attenuation = attenuation_input.value()
         else:
+            attenuation_input.error("value required")
             valid = 0
         
         if(valid == 1):
+            sampling_input.error("")
+            cutoff_input.error("")
+            attenuation_input.error("")
+            transition_input.error("")
             page.splash = ft.ProgressBar()
             design_btn.disabled = True
             validate_btn.disabled = True
@@ -196,15 +225,12 @@ def main(page: ft.Page):
             delay.value = ""
             length.value = ""
             page.update()
-            dlg = ft.AlertDialog(
-                    title=ft.Text("Input fields cannot be empty"),
-                    icon=ft.Icon(name="warning")
-                )
-            page.dialog = dlg
-            dlg.open = True
-            page.update()
 
     def clear(e):
+        sampling_input.error("")
+        cutoff_input.error("")
+        attenuation_input.error("")
+        transition_input.error("")
         cutoff_input.clean_all()
         sampling_input.clean_all()
         transition_input.clean_all()
