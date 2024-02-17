@@ -155,7 +155,7 @@ def main(page: ft.Page):
             transition_input.error("value required")
             valid = 0
         else:
-            transition_input.error("value required")
+            transition_input.error("")
         
         if valid == 1:
             sampling_input.error("")
