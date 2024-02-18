@@ -116,9 +116,6 @@ def main(page: ft.Page):
         page.update()
         time.sleep(2)
         page.splash = None
-        design_btn.disabled = False
-        validate_btn.disabled = False
-        clear_btn.disabled = False
         page.update()
         filter = FIR.LP_Filter(attenuation, transition, cutoff, sampling)
 
@@ -132,27 +129,32 @@ def main(page: ft.Page):
         dlg.open = True
         page.update()
         display_info_true()
+        design_btn.disabled = False
+        validate_btn.disabled = False
+        clear_btn.disabled = False
+        page.update()
+        
         
 
     def generate(e):
         valid = 1
         if(sampling_input.value() == ""):
-            sampling_input.error("value required")
+            sampling_input.error("this field is required")
             valid = 0
         else:
             sampling_input.error("")
         if(cutoff_input.value() == ""):
-            cutoff_input.error("value required")
+            cutoff_input.error("this field is required")
             valid = 0
         else:
             cutoff_input.error("")
         if(attenuation_input.value() == ""):
-            attenuation_input.error("value required")
+            attenuation_input.error("this field is required")
             valid = 0
         else:
             attenuation_input.error("")
         if(transition_input.value() == ""):
-            transition_input.error("value required")
+            transition_input.error("this field is required")
             valid = 0
         else:
             transition_input.error("")
@@ -179,25 +181,25 @@ def main(page: ft.Page):
             sampling_input.error("")
             sampling = sampling_input.value()
         else:
-            sampling_input.error("value required")
+            sampling_input.error("this field is required")
             valid = 0
         if(transition_input.value()!= ""):
             transition_input.error("")
             transition = transition_input.value()
         else:
-            transition_input.error("value required")
+            transition_input.error("this field is required")
             valid = 0
         if(cutoff_input.value()!=""):
             cutoff_input.error("")
             cutoff = cutoff_input.value()
         else:
-            cutoff_input.error("value required")
+            cutoff_input.error("this field is required")
             valid = 0
         if(attenuation_input.value()!=""):
             attenuation_input.error("")
             attenuation = attenuation_input.value()
         else:
-            attenuation_input.error("value required")
+            attenuation_input.error("this field is required")
             valid = 0
         
         if(valid == 1):
@@ -212,15 +214,25 @@ def main(page: ft.Page):
             page.update()
             time.sleep(2)
             page.splash = None
-            design_btn.disabled = False
-            validate_btn.disabled = False
-            clear_btn.disabled = False
             page.update()
             filter = FIR.LP_Filter(attenuation, transition, cutoff, sampling)
             filter.PlotAmplitudeLinear()
             filter.PlotAmplitudeLogarithmic()
             filter.PlotImpulse()
             display_info_true()
+            dlg = ft.AlertDialog(
+                icon=ft.Icon(name="Done"),
+                title=ft.Text("     Plots are Ready"),
+                bgcolor=ft.colors.GREEN_300
+            )
+            page.dialog = dlg
+            dlg.open = True
+            page.update()
+            design_btn.disabled = False
+            validate_btn.disabled = False
+            clear_btn.disabled = False
+            page.update()
+            
         else:
             delay.value = ""
             length.value = ""
