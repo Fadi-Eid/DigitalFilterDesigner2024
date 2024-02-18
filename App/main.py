@@ -293,14 +293,35 @@ def main(page: ft.Page):
     def open_repo():
         page.launch_url('https://github.com/Fadi-Eid/DigitalFilterDesign')
 
+    def close_banner(e):
+        page.banner.open = False
+        page.update()
+
+    page.banner = ft.Banner(
+        bgcolor=ft.colors.GREEN_300,
+        leading=ft.Icon(ft.icons.INBOX, color=ft.colors.LIGHT_BLUE_100, size=40),
+        content=ft.Text(
+            "\n\n  CTRL + H  to open GitHub docs\n  CTRL + T to change the theme\n" + 
+            "  CTRL + D to delete input values\n  CTRL + N to fill the fields with default values\n" + 
+            "  CTRL + R to compute specified filter length and delay" + "\n\n"
+        ),
+        actions=[
+            ft.TextButton("Close", on_click=close_banner),
+        ],
+    )
+
+    def show_banner_click(e):
+        page.banner.open = True
+        page.update()
 
 
+    help_buton = ft.FloatingActionButton(icon=ft.icons.HELP, on_click=show_banner_click, mini=True)
     design_btn = ft.ElevatedButton(text="Generate filter", on_click=generate)
     validate_btn = ft.ElevatedButton(text="Validate filter", on_click=validate)
     clear_btn = ft.ElevatedButton(text="Clear input", on_click=clear)
 
     buttons = ft.Row(spacing=20, alignment=ft.MainAxisAlignment.CENTER, controls=[
-        design_btn, validate_btn, clear_btn
+        design_btn, validate_btn, clear_btn, help_buton
     ])
 
     left_panel = ft.Column(controls=[parameter_section, buttons])
