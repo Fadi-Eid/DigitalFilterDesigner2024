@@ -76,6 +76,36 @@ def main(page: ft.Page):
             transition_input.set_to_default()
             cutoff_input.set_to_default()
             attenuation_input.set_to_default()
+        if (e.ctrl == True) and (e.key == "r" or e.key == "R"):
+            # compute length and delay only
+            valid = 1
+            if(sampling_input.value() == ""):
+                sampling_input.error("this field is required")
+                valid = 0
+            else:
+                sampling_input.error("")
+            if(cutoff_input.value() == ""):
+                cutoff_input.error("this field is required")
+                valid = 0
+            else:
+                cutoff_input.error("")
+            if(attenuation_input.value() == ""):
+                attenuation_input.error("this field is required")
+                valid = 0
+            else:
+                attenuation_input.error("")
+            if(transition_input.value() == ""):
+                transition_input.error("this field is required")
+                valid = 0
+            else:
+                transition_input.error("")
+            
+            if valid == 1:
+                sampling_input.error("")
+                cutoff_input.error("")
+                attenuation_input.error("")
+                transition_input.error("")
+                display_info_true()
             
     
     page.on_keyboard_event = on_keyboard
@@ -261,7 +291,8 @@ def main(page: ft.Page):
         page.update()
 
     def open_repo():
-        page.launch_url('https://github.com/Fadi-Eid/DigitalFilterDesign')  
+        page.launch_url('https://github.com/Fadi-Eid/DigitalFilterDesign')
+
 
 
     design_btn = ft.ElevatedButton(text="Generate filter", on_click=generate)

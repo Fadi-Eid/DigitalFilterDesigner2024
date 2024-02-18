@@ -109,6 +109,15 @@ class LP_Filter():
         fig2.add_trace(go.Scatter(x=freq[:nfft//2], y=Hf[:nfft//2],
                          mode='lines', name='H(f)',
                          line=dict(color='violet', width=3)))
+        fig2.add_shape(type="line",
+              x0=0, y0=1, x1=self.cutoff-self.transition/2, y1=1,
+              line=dict(color="black", width=0.8))
+        fig2.add_shape(type="line",
+              x0=self.cutoff-self.transition/2, y0=1, x1=self.cutoff+self.transition/2, y1=10**(-self.attenuation/20),
+              line=dict(color="black", width=0.8))
+        fig2.add_shape(type="line",
+              x0=self.cutoff+self.transition/2, y0=10**(-self.attenuation/20), x1=max(freq), y1=10**(-self.attenuation/20),
+              line=dict(color="black", width=0.8))
         fig2.update_layout(title='Amplitude response of the generated filter',
                   xaxis_title='Frequency (Hz)',
                   yaxis_title='Amplitude (Gain)',
@@ -131,6 +140,12 @@ class LP_Filter():
         fig3.add_trace(go.Scatter(x=freq[:nfft//2], y=20 * np.log10(Hf[:nfft//2]),
                          mode='lines', name='H(f)',
                          line=dict(color='red', width=3)))
+        fig3.add_shape(type="line",
+              x0=0, y0=0, x1=max(freq), y1=0,
+              line=dict(color="black", width=0.7))
+        fig3.add_shape(type="line",
+              x0=0, y0=-self.attenuation, x1=max(freq), y1=-self.attenuation,
+              line=dict(color="black", width=0.7))
         fig3.update_layout(title='Amplitude response of the generated filter',
                   xaxis_title='Frequency (Hz)',
                   yaxis_title='Amplitude (dB)',
