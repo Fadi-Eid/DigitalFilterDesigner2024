@@ -54,6 +54,7 @@ def main(page: ft.Page):
     page.title = "Digital Filter Designer 2024"
     page.theme_mode = "light"
     page.theme = ft.Theme(color_scheme_seed="blue")
+    page.scroll = ft.ScrollMode.AUTO
     
     page.window_width = 620        # window's width is 200 px
     page.window_height = 700       # window's height is 200 px
@@ -322,19 +323,20 @@ def main(page: ft.Page):
 
     buttons = ft.Row(spacing=20, alignment=ft.MainAxisAlignment.CENTER, controls=[
         design_btn, validate_btn, clear_btn, help_buton
-    ])
+    ], scroll=True)
 
     left_panel = ft.Column(controls=[parameter_section, buttons])
 
     # Create the right panel image
     img = ft.Image(
-        src=f"./App/assets/help2.png",
+        src=f"./assets/help2.png",
         width=320,
         height=320,
         repeat=ft.ImageRepeat.NO_REPEAT,
         border_radius=ft.border_radius.all(5)
         #fit=ft.ImageFit.CONTAIN,
     )
+    
 
     delay_box = ft.Text("Filter delay", theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM,
                         font_family="Tahoma")
