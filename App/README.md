@@ -1,5 +1,5 @@
 # How to Use
-### Instalation
+## Instalation
 Before using the GUI make sure that you have python 3.8 and above installed on your machine, after that, open the terminal and install the modules:
 ```bash
 pip install numpy
@@ -8,7 +8,7 @@ pip install flet
 pip install scipy
 ```
 
-### GUI Features:
+## GUI Features:
 1. **Shortcuts**: Many shortcuts are available to facilitate the use of the software.
 * **CTRL + d**: Deletes all the values in the input fields
 * **CTRL + t**: Toggles between light and dark mode
@@ -16,6 +16,12 @@ pip install scipy
 * **CTRL + h**: Opens the documentation in the browser
 * **CTRL + r**: Compute the filter length and number of coefficients for the specified parameters (use before generating/validating the filter)
 * **CTRL + n**: Fills the input fields with default values
+
+  ### Install the executable
+  If you don't want to build the code using Python, and you have a windows 10/11 machine, you can directly install the .exe file and start using the tool.
+  To do that, install the executable ([link](https://drive.google.com/file/d/13FM3bngaqNiSl89GA2MUs_NkhqwcM4jU/view?usp=drive_link)) and extract the .zip file in a folder.
+  ![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/5b25c5cb-271a-4ced-aa96-d470e9f0b917)
+
 
 
 2. __**Filter Validation**__: After the input fields are all specified, the filter can be validated using the validate button, which open three interactive plots in the browser.
@@ -42,5 +48,5 @@ For the validation of any generated filter, the provided Python code will diplay
 ![image](https://github.com/Fadi-Eid/DigitalFilterDesign/assets/113466842/0df91bc5-6b6b-4194-a81a-8c6dace6d628)
 
 
-# Video demo
+## Video demo
 [YouTube](https://youtu.be/WzR1Gm4fmk0)
