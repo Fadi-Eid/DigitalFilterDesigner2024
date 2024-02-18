@@ -15,7 +15,9 @@ class Parameter(ft.UserControl):
             regex_string=r"[0-9]",
             allow=True,
             replacement_string="",
-        ))
+        ), height=70)
+
+    
 
     def build(self):
         self.param_unit = ft.Text(self.box_unit, weight=ft.FontWeight.BOLD)
@@ -71,7 +73,7 @@ def main(page: ft.Page):
         if (e.ctrl == True) and (e.key == "d" or e.key == "D"):
             clear_shortcut()
         if (e.ctrl == True) and (e.key == "h" or e.key == "H"):
-            open_repo()
+            open_repo(0)
         if (e.ctrl == True) and (e.key == "n" or e.key == "N"):
             sampling_input.set_to_default()
             transition_input.set_to_default()
@@ -119,7 +121,8 @@ def main(page: ft.Page):
     parameter_section = ft.Column(
         controls=[
             sampling_input, transition_input, cutoff_input, attenuation_input
-        ]
+        ],
+        width=550
     )
     def display_info_true():
         sampling = sampling_input.value()
@@ -291,7 +294,7 @@ def main(page: ft.Page):
         length.value = "0"
         page.update()
 
-    def open_repo():
+    def open_repo(x):
         page.launch_url('https://github.com/Fadi-Eid/DigitalFilterDesign')
 
     def close_banner(e):
@@ -302,9 +305,9 @@ def main(page: ft.Page):
         bgcolor=ft.colors.GREEN_300,
         leading=ft.Icon(ft.icons.INBOX, color=ft.colors.LIGHT_BLUE_100, size=40),
         content=ft.Text(
-            "\n\n  CTRL + H  to open GitHub docs\n  CTRL + T to change the theme\n" + 
-            "  CTRL + D to delete input values\n  CTRL + N to fill the fields with default values\n" + 
-            "  CTRL + R to compute specified filter length and delay" + "\n\n"
+            "\n CTRL + H  to open GitHub docs\n CTRL + T to change the theme\n" + 
+            " CTRL + D to delete input values\n CTRL + N to fill the fields with default values\n" + 
+            " CTRL + R to compute specified filter length and delay" + "\n"
         ),
         actions=[
             ft.TextButton("Close", on_click=close_banner),
@@ -312,11 +315,29 @@ def main(page: ft.Page):
     )
 
     def show_banner_click(e):
-        page.banner.open = True
-        page.update()
+        if page.banner.open == False:
+            page.banner.open = True
+            page.update()
+        else:
+            page.banner.open = False
+            page.update()
+
+    page.appbar = ft.AppBar(
+        title=ft.Text("Digital Filter Designer 2024 - FIR",
+                      color=ft.colors.GREY_800,
+                      size=16,
+                      weight=ft.FontWeight.W_200,),
+        leading_width=40,
+        toolbar_height=40,
+        center_title=False,
+        bgcolor=ft.colors.BLUE_100,
+        actions=[
+            ft.IconButton(ft.icons.HELP, on_click=show_banner_click)
+        ],
+    )
 
 
-    help_buton = ft.FloatingActionButton(icon=ft.icons.HELP, on_click=show_banner_click, mini=True)
+    help_buton = ft.IconButton(icon=ft.icons.LINK, on_click=open_repo)
     design_btn = ft.ElevatedButton(text="Generate filter", on_click=generate)
     validate_btn = ft.ElevatedButton(text="Validate filter", on_click=validate)
     clear_btn = ft.ElevatedButton(text="Clear input", on_click=clear)
