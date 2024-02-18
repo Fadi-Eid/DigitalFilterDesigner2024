@@ -10,11 +10,13 @@ pip install scipy
 
 ### GUI Features:
 1. **Shortcuts**: Many shortcuts are available to facilitate the use of the software.
-* **CTRL + D**: Deletes all the values in the input fields
-* **CTRL + T**: Toggles between light and dark mode
+* **CTRL + d**: Deletes all the values in the input fields
+* **CTRL + t**: Toggles between light and dark mode
 * **TAB**: Moves focus to the next input field or button
-* **CTRL + H**: Opens the documentation in the browser
-* **CTRL + N**: Fills the input fields with default values
+* **CTRL + h**: Opens the documentation in the browser
+* **CTRL + r**: Compute the filter length and number of coefficients for the specified parameters (use before generating/validating the filter)
+* **CTRL + n**: Fills the input fields with default values
+
 
 2. __**Filter Validation**__: After the input fields are all specified, the filter can be validated using the validate button, which open three interactive plots in the browser.
 The first plot is the impulse response of the generated filter, the second is the linear plot of the amplitude response, and the third plot is the logarithmic plot of the amplitude response.
