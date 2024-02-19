@@ -15,7 +15,7 @@ class Parameter(ft.UserControl):
             regex_string=r"[0-9]",
             allow=True,
             replacement_string="",
-        ), height=70)
+        ), height=65)
 
     
 
@@ -122,7 +122,10 @@ def main(page: ft.Page):
         controls=[
             sampling_input, transition_input, cutoff_input, attenuation_input
         ],
-        width=550
+        width=520,
+        spacing=10,
+        height=300,
+        alignment=ft.MainAxisAlignment.CENTER
     )
     def display_info_true():
         sampling = sampling_input.value()
@@ -324,15 +327,16 @@ def main(page: ft.Page):
 
     page.appbar = ft.AppBar(
         title=ft.Text("Digital Filter Designer 2024 - FIR",
-                      color=ft.colors.GREY_800,
-                      size=16,
-                      weight=ft.FontWeight.W_200,),
-        leading_width=40,
+                      color=ft.colors.GREY_700,
+                      size=17,
+                      weight=ft.FontWeight.W_700,),
+        leading_width=0,
         toolbar_height=40,
         center_title=False,
-        bgcolor=ft.colors.BLUE_100,
+        bgcolor=ft.colors.LIGHT_BLUE_100,
+        elevation=3,
         actions=[
-            ft.IconButton(ft.icons.HELP, on_click=show_banner_click)
+            ft.IconButton(ft.icons.HELP, on_click=show_banner_click, scale=0.9)
         ],
     )
 
@@ -346,7 +350,7 @@ def main(page: ft.Page):
         design_btn, validate_btn, clear_btn, help_buton
     ], scroll=True)
 
-    left_panel = ft.Column(controls=[parameter_section, buttons])
+    left_panel = ft.Column(controls=[parameter_section, buttons], spacing=13)
 
     # Create the right panel image
     img = ft.Image(
@@ -378,7 +382,9 @@ def main(page: ft.Page):
 
     right_panel = ft.Row( width=page.window_width, controls=[img, info_disp])
 
-    page.add(left_panel, right_panel)
+    figure = ft.Column(controls=[left_panel, right_panel], horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                       spacing=0)
+
+    page.add(figure)
 
 ft.app(target=main, assets_dir="assets")
-          
