@@ -1,26 +1,10 @@
 function [h,del] = fircheb(N,D,W)
-% h = fircheb(N,D,W)
-% weighted Chebyshev design of Type I FIR filters
-%
-%   h : length-N impulse response
-%   N : length of filter (odd)
-%   D : ideal response   (uniform grid)
-%   W : weight function  (uniform grid)
-%   need: length(D) == length(W)
-%
-% % Example
-%   N = 31;  Kp = 1; Ks = 4;  
-%   wp = 0.26*pi;  ws = 0.34*pi; wo = 0.3*pi;
-%   L = 1000;
-%   w = [0:L]*pi/L;
-%   W = Kp*(w<=wp) + Ks*(w>=ws);
-%   D = (w<=wo);
-%   h = fircheb(N,D,W);
-
 % subprograms: locmax.m, etap.m
 
+% convert the arguments to column vector regardless of the shape
 W = W(:);
 D = D(:);
+% get the grid size - 1 --> (0 -> L) = grid size
 L = length(W)-1;
 
 SN = 1e-8;               % small number for stopping criteria, etc
@@ -28,7 +12,8 @@ M = (N-1)/2;
 R = M + 2;               % R = size of reference set
 
 % initialize reference set (approx equally spaced where W>0) 
-f = find(W>SN);
+f = find(W>SN); % find the indices of W where W > 0
+% initial reference set (indices)
 k = f(round(linspace(1,length(f),R)));
 
 w = [0:L]'*pi/L;
@@ -40,11 +25,21 @@ while 1
    x = [cos(w(k)*m), s./W(k)] \ D(k);
    a = x(1:M+1);		% cosine coefficients
    del = x(M+2);		% delta
+   % get the impulse response from the a(n)
    h = [a(M+1:-1:2); 2*a(1); a(2:M+1)]/2;
+   % generated amplitude response
    A = firamp(h,1,L)';
-   err = (A-D).*W;		% weighted error
+   plot(w, A)
+   hold on
+   plot(w, D)
+   hold off
+   % compute the error function
+   err = (A-D).*W;		% weighted error2
+   figure
+   plot(w, err)
 
    % --------------- Update Reference Set ----------------------------
+   % find the extremas
    newk = sort([locmax(err); locmax(-err)]);  
    errk = (A(newk)-D(newk)).*W(newk);         
 
