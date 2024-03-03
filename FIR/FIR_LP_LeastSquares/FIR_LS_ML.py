@@ -1,7 +1,9 @@
 import numpy as np
 from scipy.linalg import (hankel, toeplitz)
-import mpmath as mp
 import plotly.graph_objects as go
+import random
+
+# This script generates a dataset to train an ML model
 
 # weight must be positive
 def firls(numtaps, bands, desired, weight=None, nyq=None, fs=None):
@@ -53,6 +55,7 @@ def PlotAmplitudeLinear(coeff, N):
     sampling = 2
     Hf = np.abs(np.fft.fft(coeff, nfft))
     freq = np.fft.fftfreq(nfft, d=1/sampling)
+    
 
     fig2 = go.Figure()
     fig2.add_trace(go.Scatter(x=freq[:nfft//2], y=Hf[:nfft//2],
@@ -72,7 +75,7 @@ def PlotAmplitudeLinear(coeff, N):
     fig2.show()
 
 def PlotAmplitudeLogarithmic(coeff, N):
-    nfft = N*4
+    nfft = N*5
     sampling = 2    # 2 Hz
     Hf = np.abs(np.fft.fft(coeff, nfft))
     freq = np.fft.fftfreq(nfft, d=1/sampling)
@@ -98,9 +101,123 @@ def PlotAmplitudeLogarithmic(coeff, N):
                 )
     fig3.show()
 
+def Amplitude(coeff, N):
+        n_fft = N     # number of FFT points
+        Hf = np.abs(np.fft.fft(coeff, n_fft))   # amplitude response
+        return Hf
 
-N = 2211
-coeff = firls(numtaps=N, bands=[0, 0.395, 0.405, 1], desired=[1, 1, 0, 0], weight=[1, 3])
+def Amplitude_padded(coeff, N, padd = 5):
+        n_fft = N*5     # number of FFT points
+        Hf = np.abs(np.fft.fft(coeff, n_fft))   # amplitude response
+        return Hf
 
-PlotAmplitudeLogarithmic(coeff, N)
-PlotAmplitudeLinear(coeff, N)
+def MSE(coeff, N, cutoff):
+        M = N // 2 + 1
+        df = 2 / N
+
+        actual = Amplitude(coeff, N)  # actual amplitude response
+
+        if actual is None:
+            raise ValueError("Amplitude response is None")
+        actual = actual[:M]
+
+        # create the ideal amplitude
+        cutoff_index = int(np.round(cutoff / df))  # Ensure integer value
+        ideal1 = np.ones(cutoff_index)
+        ideal2 = np.zeros(M - cutoff_index)
+        ideal = np.concatenate((ideal1, ideal2))
+        # compute the MSE
+        mse = np.mean((actual - ideal) ** 2)
+        return mse
+
+def transitionMSE(coeff, N, cutoff, df):
+    # compute the mag. response of coeff
+    padd = 5   # fft padding
+    M = (N*padd) // 2 + 1 # half
+    actual = Amplitude_padded(coeff, N, padd)
+    # create the frequency axis vector
+    actual = actual[:M]
+
+    # find the index of the cutoff frequency
+    cutoff_low_index = int(round((cutoff-df/2) * M))
+    cutoff_high_index = int(round((cutoff+df/2) * M))
+    actual = actual[cutoff_low_index:cutoff_high_index]
+
+    # create the ideal transition
+    ideal = np.linspace(1, 0, len(actual))
+
+    mse = np.mean((actual - ideal) ** 2)
+    return mse
+
+def computeAttenuation(coeff, N, cutoff):
+    nfft = N*5
+    sampling = 2
+    M = nfft // 2 + 1
+    Hf = np.abs(np.fft.fft(coeff, nfft))
+    y=20 * np.log10(Hf[:M])
+    cutoff_index = int(round((cutoff) * M))
+    mag = y[cutoff_index]
+    while(True):
+        cutoff_index = cutoff_index + 1
+        if y[cutoff_index] < mag:
+            mag = y[cutoff_index]
+        else:
+             return y[cutoff_index]
+         
+
+
+
+
+NFLTR = 0
+count = 1
+while(True):
+    # create cutoff frequency
+    cutoff = random.uniform(0.1, 0.9)
+    #print("Cutoff:", cutoff)
+
+    # generate a transition band  width
+    while True:
+        df = random.uniform(0.005, 0.15)
+        if cutoff - df/2 > 0.05:
+            break
+        if cutoff + df/2 < 0.95:
+            break
+        cutoff = random.uniform(0.1, 0.9)
+
+    #print("Transition band: ", df)
+
+    
+
+    # generate weights
+    Kp = 1
+    Ks = random.uniform(1, 5)
+
+    # generate filter order
+    N = random.randint(30, 8000)
+    #print("Filter length: ", N)
+    
+    coeff = firls(numtaps=N, bands=[0, cutoff - df/2, cutoff + df/2, 1], desired=[1, 1, 0, 0], weight=[Kp, Ks])
+    amp = Amplitude(coeff, N)
+
+
+    # best transition MSE = 0.4
+    if  np.max(amp) < 1.5 and transitionMSE(coeff, N, cutoff, df) < 0.025:
+        NFLTR = NFLTR + 1
+        ripple = np.max(amp)
+        attenuation = computeAttenuation(coeff, N, cutoff)
+        print(f"generated filter #{NFLTR} iteration {count}")       
+        print("_____________________________________________________\n\n")
+        with open('TrainingSet.txt', 'a') as file:
+             file.write(f"{N}, {attenuation}, {abs(1-ripple)}, {df}, {Ks}\n")
+             # Attenuation: Stop band attenuation in dB
+             # N: Filter length
+             # ripple: Pass-band gain
+             # df: transition band width in Hz
+             # Ks: stop-band weight (Kp=1)
+
+
+    
+    count = count + 1
+
+    if NFLTR > 1000:
+         break

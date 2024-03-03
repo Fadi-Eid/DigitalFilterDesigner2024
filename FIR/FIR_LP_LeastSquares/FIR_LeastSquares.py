@@ -1,90 +1,74 @@
-# non-iterative Optimal (in the least-squares sense) FIR filter design
-# using the weighted least-squares method.
-# A weighting factor (K) was used to give importance to the stop-band
-# over the pass-band, ensuring high levels of attenuation (~160dB).
-
-# References:
-# New York University, Linear-phase FIR filter design by least squares
-
 import numpy as np
-from scipy.linalg import toeplitz
-from scipy.linalg import hankel
+from scipy.linalg import (hankel, toeplitz)
 import plotly.graph_objects as go
 
 
-class LP_Filter():
-    def __init__(self, attenuation, transition, cutoff, sampling):
-        self.cutoff = cutoff
-        self.transition = transition
-        self.attenuation = attenuation
-        self.sampling = sampling
-        self.fp = (cutoff-self.transition/2)
-        self.fs = (cutoff+self.transition/2)
-        self.K = 3
-        self.N = 0
-        # filter length estimation using the Fred Harris rule of thumb
-        A = attenuation
-        if A <= 60:
-            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.1)
-        elif A > 60 and A <= 80:
-            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.25)
-        elif A > 80 and A <= 150:
-            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.4)
-        elif A > 150 and A <= 165:
-            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.52)
-        else:
-            A = 170
-            self.N = round((sampling / (self.fs - self.fp)) * (abs(A) / 22) * 1.7)
-        
-        if self.N % 2 == 0:
-            self.N += 1
 
-        self.M = (self.N - 1) // 2
+class FIR_Filter():
+    def __init__(self, numtaps, bands, desired, weight=None):
+        self.numtaps = numtaps
 
-        # normalize fp and fs
-        self.fp = self.fp / (self.sampling / 2)
-        self.fs = self.fs / (self.sampling / 2)
+        self.numtaps = int(self.numtaps)
+        if self.numtaps < 1:
+            raise ValueError("numtaps must be >= 1")
+
+        if self.numtaps % 2 == 0:    # make odd (Type 1)
+            self.numtaps = self.numtaps + 1
+
+        self.bands = bands
+        self.desired = desired
+        self.weight = weight
+        self.fs = 2
+        self.nyq = 1    # normalized Nyquist frequency (1Hz)
+        self.computedCoeffs = 0
+        self.coeffs = np.zeros(self.numtaps)
+
 
     def Impulse(self):
-        # construct q(k)
-        x1 = np.array([self.fp + self.K * (1 - self.fs)])
-        x2 = self.fp * np.sinc(self.fp * np.arange(1, 2 * self.M+1)) - self.K * self.fs * np.sinc(self.fs * np.arange(1, 2 * self.M + 1))
-        q = np.concatenate((x1, x2))
+        if self.computedCoeffs == 1:
+            return self.coeffs
 
-        # construct Q1, Q2, Q
-        Q1 = toeplitz(q[0:self.M+1])
-        Q2 = hankel(q[:self.M + 1], q[self.M:2 * self.M + 1])
-        Q = (Q1 + Q2) / 2
+        M = (self.numtaps-1) // 2
 
-        # construct b
-        b = self.fp * np.sinc(self.fp * np.arange(self.M + 1))
+        self.bands = np.asarray(self.bands).flatten() / self.nyq    
+        self.bands.shape = (-1, 2)
 
-        # solve linear system to get a(n)
+        self.desired = np.asarray(self.desired).flatten()
+        self.desired.shape = (-1, 2)
+
+        if self.weight is None:
+            self.weight = np.ones(len(self.desired))
+        self.weight = np.asarray(self.weight).flatten()
+
+        n = np.arange(self.numtaps)[:, np.newaxis, np.newaxis]
+        q = np.dot(np.diff(np.sinc(self.bands * n) * self.bands, axis=2)[:, :, 0], self.weight)
+
+        Q1 = toeplitz(q[:M+1])
+        Q2 = hankel(q[:M+1], q[M:])
+        Q = Q1 + Q2
+
+        n = n[:M + 1]
+        m = (np.diff(self.desired, axis=1) / np.diff(self.bands, axis=1))
+        c = self.desired[:, [0]] - self.bands[:, [0]] * m
+        b = self.bands * (m*self.bands + c) * np.sinc(self.bands * n)
+
+        b[0] -= m * self.bands * self.bands / 2.
+        b[1:] += m * np.cos(n[1:] * np.pi * self.bands) / (np.pi * n[1:]) ** 2
+        b = np.dot(np.diff(b, axis=2)[:, :, 0], self.weight)
+
         a = np.linalg.solve(Q, b)
 
-        # form impulse response h(n)
-        h = np.concatenate([a[self.M:0:-1], 2 * a[0] * np.ones(1), a[1:self.M + 1]]) / 2
+        self.coeffs = np.hstack((a[:0:-1], 2 * a[0], a[1:]))
+        self.computedCoeffs = 1
+        return self.coeffs
 
-        return h
-    
-    def Length(self):
-        return self.N
-    
-    # (N-1)/2 * Fs --> x1000 for milliseconds
-    def Delay(self):
-        delay = (((self.N - 1)/2) / self.sampling) * 1000
-        return delay
-    
-    # compute the amplitude response
-    def Amplitude(self):
-        n_fft = self.N      # number of FFT points
-        Hf = np.abs(np.fft.fft(self.Impulse(), n_fft))   # amplitude response
-        return Hf
 
     def PlotImpulse(self):
-        ht = self.Impulse()
+        if self.computedCoeffs == 0:
+            self.Impulse()
+
         fig1 = go.Figure()
-        fig1.add_trace(go.Scatter(y=ht,
+        fig1.add_trace(go.Scatter(y=self.coeffs,
                          mode='lines', name='h(n)',
                          line=dict(color='green', width=3)))
         fig1.update_layout(title='Impulse response of the generated filter',
@@ -100,117 +84,100 @@ class LP_Filter():
                   )
         fig1.show()
     
+    
     def PlotAmplitudeLinear(self):
-        nfft = self.Length()
-        Hf = np.abs(np.fft.fft(self.Impulse(), nfft))
-        freq = np.fft.fftfreq(nfft, d=1/self.sampling)
+        if self.computedCoeffs == 0:
+            self.Impulse()
+
+        N = self.numtaps
+        nfft = N * 4
+        sampling = 2
+
+        Hf = np.abs(np.fft.fft(self.coeffs, nfft))
+        freq = np.fft.fftfreq(nfft, d=1/sampling)
 
         fig2 = go.Figure()
         fig2.add_trace(go.Scatter(x=freq[:nfft//2], y=Hf[:nfft//2],
-                         mode='lines', name='H(f)',
-                         line=dict(color='violet', width=3)))
-        fig2.add_shape(type="line",
-              x0=0, y0=1, x1=self.cutoff-self.transition/2, y1=1,
-              line=dict(color="black", width=0.8))
-        fig2.add_shape(type="line",
-              x0=self.cutoff-self.transition/2, y0=1, x1=self.cutoff+self.transition/2, y1=10**(-self.attenuation/20),
-              line=dict(color="black", width=0.8))
-        fig2.add_shape(type="line",
-              x0=self.cutoff+self.transition/2, y0=10**(-self.attenuation/20), x1=max(freq), y1=10**(-self.attenuation/20),
-              line=dict(color="black", width=0.8))
+                            mode='lines', name='H(f)',
+                            line=dict(color='violet', width=3)))
         fig2.update_layout(title='Amplitude response of the generated filter',
-                  xaxis_title='Frequency (Hz)',
-                  yaxis_title='Amplitude (Gain)',
-                  xaxis_type='linear',
-                  xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
-                  font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
-                  legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
-                  plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
-                  paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
-                  margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
-                  )
+                    xaxis_title='Frequency (Hz)',
+                    yaxis_title='Amplitude (Gain)',
+                    xaxis_type='linear',
+                    xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+                    font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
+                    legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
+                    plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+                    paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
+                    margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
+                    )
         fig2.show()
 
+    
     def PlotAmplitudeLogarithmic(self):
-        nfft = self.Length()*4
-        Hf = np.abs(np.fft.fft(self.Impulse(), nfft))
-        freq = np.fft.fftfreq(nfft, d=1/self.sampling)
+        if self.computedCoeffs == 0:
+            self.Impulse()
+
+        N = self.numtaps
+        nfft = N*4
+        sampling = 2    # 2 Hz
+        Hf = np.abs(np.fft.fft(self.coeffs, nfft))
+        freq = np.fft.fftfreq(nfft, d=1/sampling)
 
         fig3 = go.Figure()
         fig3.add_trace(go.Scatter(x=freq[:nfft//2], y=20 * np.log10(Hf[:nfft//2]),
-                         mode='lines', name='H(f)',
-                         line=dict(color='red', width=3)))
+                            mode='lines', name='H(f)',
+                            line=dict(color='red', width=3)))
         fig3.add_shape(type="line",
-              x0=0, y0=0, x1=max(freq), y1=0,
-              line=dict(color="black", width=0.7))
-        fig3.add_shape(type="line",
-              x0=0, y0=-self.attenuation, x1=max(freq), y1=-self.attenuation,
-              line=dict(color="black", width=0.7))
+                x0=0, y0=0, x1=max(freq), y1=0,
+                line=dict(color="black", width=0.7))
+        
         fig3.update_layout(title='Amplitude response of the generated filter',
-                  xaxis_title='Frequency (Hz)',
-                  yaxis_title='Amplitude (dB)',
-                  xaxis_type='linear',
-                  xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
-                  font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
-                  legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
-                  plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
-                  paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
-                  margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
-                  )
+                    xaxis_title='Frequency (Hz)',
+                    yaxis_title='Amplitude (dB)',
+                    xaxis_type='linear',
+                    xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+                    font=dict(family='Arial', size=14, color='black'),  # Customize font family and size
+                    legend=dict(x=0.02, y=0.98),  # Position legend in top-left corner
+                    plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+                    paper_bgcolor='rgb(240, 240, 240)',  # Set paper background color
+                    margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
+                    )
         fig3.show()
 
+
     def SaveCoeffs(self):
+        if self.computedCoeffs == 0:
+            self.Impulse()
         fileName = 'coefficients.csv'
-        np.savetxt(fileName, self.Impulse(), delimiter=',')
+        np.savetxt(fileName, self.coeffs, delimiter=',')
 
     def PrintCoeffs(self):
-        for i in self.Impulse():
+        if self.computedCoeffs == 0:
+            self.Impulse()
+        for i in self.coeffs:
             print(f"{i}, ")
 
-    # Calculate the Mean squared error between the desired
-    # and the actual response, this can be used as a cost function
-    def MSE(self):
-        M = self.Length() // 2 + 1
-        df = self.sampling / self.Length()
-        actual = self.Amplitude()  # actual amplitude response
+    # (N-1)/2 * Fs --> x1000 for milliseconds
+    def Delay(self):
+        delay = (((self.numtaps - 1)/2) / self.fs) * 1000
+        return delay
 
-        if actual is None:
-            raise ValueError("Amplitude response is None")
-        actual = actual[:M]
-
-        # create the ideal amplitude
-        cutoff_index = int(np.round(self.cutoff / df))  # Ensure integer value
-        ideal1 = np.ones(cutoff_index)
-        ideal2 = np.zeros(M - cutoff_index)
-        ideal = np.concatenate((ideal1, ideal2))
-        # compute the MSE
-        mse = np.mean((actual - ideal) ** 2)
-        return mse
-
-###################################################################################
-###################################################################################
+    # compute the amplitude response
+    def Amplitude(self):
+        if self.computedCoeffs == 0:
+            self.Impulse()
+        Hf = np.abs(np.fft.fft(self.coeffs, self.numtaps))   # amplitude response
+        return Hf
+    
 
 
-# USER CODE
-# Filters params
-sampling = 20000     # sampling frequency in Hz
-cutoff = 5000        # cutoff frequency in Hz
-df = 79              # transition band width in Hz
-A = 82               # max dB attenuation
-
-# create an instance of the filter
-lowPass = LP_Filter(A, df, cutoff, sampling)
-
-
-# lowPass class methods
-mse = lowPass.MSE()     # returns the mean-squared error between
-                        # generated filter and the desired filter
-N = lowPass.Length()    # return the filter length
-D = lowPass.Delay()     # return the delay caused by the filter in ms
-
-lowPass.PlotImpulse()               # time-domain impulse response
-lowPass.PlotAmplitudeLinear()       # linear, frequency-domain amplitude response
-lowPass.PlotAmplitudeLogarithmic()  # logarithmic, frequency-domain amplitude response
-
-#lowPass.PrintCoeffs()   # print the generated coefficients to the terminal
-lowPass.SaveCoeffs()    # save the coefficients in a .csv file (coefficients.csv)
+######################################################################################
+    
+# create the filter class
+Filter = FIR_Filter(7001, [0, 0.349, 0.35, 0.559, 0.56, 0.709, 0.71, 1], [1, 1, 0, 0, 1, 1, 0, 0], [1, 3, 1, 5])
+Filter.PlotAmplitudeLinear()
+Filter.PlotAmplitudeLogarithmic()
+Filter.PlotImpulse()
+Filter.PrintCoeffs()
+Filter.SaveCoeffs()
