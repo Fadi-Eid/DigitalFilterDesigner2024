@@ -175,7 +175,7 @@ class FIR_Filter():
 ######################################################################################
     
 # create the filter class
-Filter = FIR_Filter(7001, [0, 0.349, 0.35, 0.559, 0.56, 0.709, 0.71, 1], [1, 1, 0, 0, 1, 1, 0, 0], [1, 3, 1, 5])
+Filter = FIR_Filter(20001, [0, 0.349, 0.35, 0.559, 0.56, 0.709, 0.71, 1], [1, 1, 0, 0, 1, 1, 0, 0], [1, 3, 1, 5])
 Filter.PlotAmplitudeLinear()
 Filter.PlotAmplitudeLogarithmic()
 Filter.PlotImpulse()
