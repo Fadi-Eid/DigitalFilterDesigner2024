@@ -354,7 +354,7 @@ def main(page: ft.Page):
 
     # Create the right panel image
     img = ft.Image(
-        src=f"./assets/help2.png",
+        src=f"./App/LowPass_Basic/assets/help2.png",
         width=320,
         height=320,
         repeat=ft.ImageRepeat.NO_REPEAT,
