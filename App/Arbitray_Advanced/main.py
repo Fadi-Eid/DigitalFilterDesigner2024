@@ -1,10 +1,12 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import FIR_LeastSquares as FIR
 
 
 class Ui_Form(object):
     def setupUi(self, Form):
+        self.filter = None
         Form.setObjectName("Form")
         Form.resize(898, 575)
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(Form)
@@ -31,11 +33,21 @@ class Ui_Form(object):
         self.horizontalLayout.setContentsMargins(50, -1, 50, -1)
         self.horizontalLayout.setSpacing(30)
         self.horizontalLayout.setObjectName("horizontalLayout")
+        self.spinBox = QtWidgets.QSpinBox(Form)
+        self.spinBox.setMinimumSize(QtCore.QSize(80, 0))
+        self.spinBox.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.spinBox.setMaximum(50000)
+        self.spinBox.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
+        self.spinBox.setProperty("value", 501)
+        self.spinBox.setObjectName("spinBox")
+        self.spinBox.valueChanged.connect(self.restart_filter)
+        
         self.AddBandButton = QtWidgets.QPushButton(Form)
         self.AddBandButton.setMaximumSize(QtCore.QSize(100, 16777215))
         self.AddBandButton.setObjectName("AddBandButton")
         self.AddBandButton.clicked.connect(self.add_band)
         self.horizontalLayout.addWidget(self.AddBandButton)
+        self.horizontalLayout.addWidget(self.spinBox)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.formLayout = QtWidgets.QFormLayout()
         self.formLayout.setObjectName("formLayout")
@@ -91,10 +103,11 @@ class Ui_Form(object):
         self.horizontalLayout_3.addWidget(self.SaveButton, 0, QtCore.Qt.AlignVCenter)
         self.PlotButton = QtWidgets.QPushButton(Form)
         self.PlotButton.setObjectName("PlotButton")
+        self.PlotButton.clicked.connect(self.plot_clicked)
         self.horizontalLayout_3.addWidget(self.PlotButton, 0, QtCore.Qt.AlignVCenter)
         self.CheckButton = QtWidgets.QPushButton(Form)
         self.CheckButton.setObjectName("CheckButton")
-        self.CheckButton.clicked.connect(self.parse_edits)
+        self.CheckButton.clicked.connect(self.check_clicked)
         self.horizontalLayout_3.addWidget(self.CheckButton, 0, QtCore.Qt.AlignVCenter)
         self.CodeButton = QtWidgets.QPushButton(Form)
         self.CodeButton.setObjectName("CodeButton")
@@ -128,17 +141,22 @@ class Ui_Form(object):
         self.AvgHealthLabel.setObjectName("AvgHealthLabel")
         self.horizontalLayout_5.addWidget(self.AvgHealthLabel)
         self.verticalLayout_5.addLayout(self.horizontalLayout_5)
-        self.verticalLayout_5.setStretch(2, 5)
         self.verticalLayout_5.setStretch(3, 1)
         self.verticalLayout_6.addLayout(self.verticalLayout_5)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
+        self.filter_created = 0
+        self.filter = None
         self.bands_list = []
         self.add_band_info()
         self.add_band()
         self.plot_on_canvas()
+
+    def restart_filter(self):
+        self.filter_created = 0
+        self.filter = None
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
@@ -169,6 +187,8 @@ class Ui_Form(object):
         label.addWidget(label3, 0, QtCore.Qt.AlignHCenter)
         label.addWidget(label4, 0, QtCore.Qt.AlignHCenter)
         self.formLayout.addRow('Band #', label)
+        self.filter_created = 0
+        self.filter = None
 
     def add_band(self):
         if len(self.bands_list) >= 8:
@@ -188,6 +208,7 @@ class Ui_Form(object):
         edit.addWidget(edit4)
         self.bands_list.append(edit)
         self.formLayout.addRow(f'Band {len(self.bands_list)}', edit)
+        
 
     def clear_all_clicked(self):
         if len(self.bands_list) >= 1:
@@ -201,6 +222,8 @@ class Ui_Form(object):
                 edit3.setText("")
                 edit4.setText("")
             self.plot_on_canvas()
+            self.filter_created = 0
+            self.filter = None
             
 
     def delete_last_clicked(self):
@@ -208,19 +231,76 @@ class Ui_Form(object):
             band = self.bands_list.pop()
             self.formLayout.removeRow(band)
             self.plot_on_canvas()
+            self.filter_created = 0
+            self.filter = None
 
-    def parse_edits(self):
-        if len(self.bands_list) >= 1:
+    def is_valid_float(self, val):
+        try:
+            float(val)
+            return True
+        except ValueError:
+            print(f"Cannot parse {val}")
+            return False
+
+    def create_filter(self):
+        if self.filter_created == 1:
+            return 1    # filter already created
+        if len(self.bands_list) >= 2:
+            weights = []
+            numtaps = self.spinBox.value()
+            bands = []
+            desired = []
+            
+            iter = 0
             for edit in self.bands_list:
-                edit1 = edit.itemAt(0).widget()
-                edit2 = edit.itemAt(1).widget()
-                edit3 = edit.itemAt(2).widget()
-                edit4 = edit.itemAt(3).widget()
-                if edit1.text() != "" and edit2.text() != "":
-                    if edit3.text() != "" and edit4.text() != "":
-                        print(edit1.text() + " " + edit2.text() + " " + edit3.text() + " " + edit4.text())
+                lower = edit.itemAt(0).widget().text()
+                upper = edit.itemAt(1).widget().text()
+                gain = edit.itemAt(2).widget().text()
+                weight = edit.itemAt(3).widget().text()
+                print(f"weight: {weight}")
+
+                if self.is_valid_float(lower) and self.is_valid_float(upper) and self.is_valid_float(gain) and self.is_valid_float(weight):
+                    iter += 1
+                    lower = float(lower)
+                    upper = float(upper)
+                    gain = float(gain)
+                    weight = float(weight)
+
+                    if lower >= upper:
+                        self.filter_created = 0
+                        print("Cannot create filter: band edges are not in ascending order")
+                        self.filter = None
+                        return 0    # not good -> band edges are not in ascending order or transition is zero
+                    else:
+                        bands.append(lower)
+                        bands.append(upper)
+                        desired.append(gain)
+                        desired.append(gain)
+                        weights.append(weight)
+                else:
+                    self.filter_created = 0
+                    self.filter = None
+                    print("Cannot create filter: non-digit inputs")
+                    return 2 # non-digits input
+        else:
+            self.filter_created = 0
+            self.filter = None
+            return 1    # minimum is two bands
+        
+        fs = bands[-1] * 2
+
+        self.filter = FIR.FIR_Filter(fs, numtaps, bands, desired, weights)
+        self.filter_created = 1
+        return 1
+
+
+    def check_clicked(self):
+        pass
+                
 
     def plot_on_canvas(self):
+        self.filter_created = 0
+        self.filter = None
         # clear the canvas
         self.figure.clear()
         num_bands = len(self.bands_list)
@@ -232,19 +312,19 @@ class Ui_Form(object):
                 upper = edit.itemAt(1).widget().text() # upp edge
                 gain = edit.itemAt(2).widget().text() # gain
                 if lower != "" and upper != "" and gain != "":
+                    try:
+                        lower = float(lower)
+                    except ValueError:
+                        print("Could not convert the string to a float")
+                    try:
+                        upper = float(upper)
+                    except ValueError:
+                        print("Could not convert the string to a float")
+                    try:
+                        gain = float(gain)
+                    except ValueError:
+                        print("Could not convert the string to a float")
                     if lower < upper:
-                        try:
-                            lower = float(lower)
-                        except ValueError:
-                            print("Could not convert the string to a float")
-                        try:
-                            upper = float(upper)
-                        except ValueError:
-                            print("Could not convert the string to a float")
-                        try:
-                            gain = float(gain)
-                        except ValueError:
-                            print("Could not convert the string to a float")
                         x.append(lower)
                         x.append(upper)
                         y.append(gain)
@@ -260,6 +340,18 @@ class Ui_Form(object):
             plt.plot(x, y)
             # refresh canvas
             self.canvas.draw()
+
+
+    def plot_clicked(self):
+        print("plot clicked")
+        if self.filter_created == 0:
+            self.create_filter()
+        if self.filter_created == 0:
+            print("Problems with input")
+            return 1    # problem with inputs
+        
+        else:
+            self.filter.PlotAmplitudeLinear()
 
 
 if __name__ == "__main__":

@@ -173,11 +173,4 @@ class FIR_Filter():
 
 
 ######################################################################################
-    
-# create the filter class
-Filter = FIR_Filter(2000, 5001, [0, 349, 350, 559, 560, 709, 710, 1000], [1, 1, 0, 0, 1, 1, 0, 0], [1, 3, 1, 5])
-Filter.PlotAmplitudeLinear()
-Filter.PlotAmplitudeLogarithmic()
-Filter.PlotImpulse()
-Filter.PrintCoeffs()
-Filter.SaveCoeffs()
+
