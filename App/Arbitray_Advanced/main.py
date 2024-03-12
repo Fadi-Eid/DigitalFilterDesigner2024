@@ -6,8 +6,9 @@ import FIR_LeastSquares as FIR
 
 class Ui_Form(object):
     def setupUi(self, Form):
+        
         self.filter = None
-        Form.setObjectName("Form")
+        Form.setObjectName("Digital Filter Designer")
         Form.resize(898, 575)
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
@@ -30,7 +31,7 @@ class Ui_Form(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setContentsMargins(50, -1, 50, -1)
+        self.horizontalLayout.setContentsMargins(50, 20, 50, 20)
         self.horizontalLayout.setSpacing(30)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.spinBox = QtWidgets.QSpinBox(Form)
@@ -41,6 +42,7 @@ class Ui_Form(object):
         self.spinBox.setProperty("value", 501)
         self.spinBox.setObjectName("spinBox")
         self.spinBox.valueChanged.connect(self.restart_filter)
+        self.spinBox.setToolTip("Filter length")
         
         self.AddBandButton = QtWidgets.QPushButton(Form)
         self.AddBandButton.setMaximumSize(QtCore.QSize(100, 16777215))
@@ -160,7 +162,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
+        Form.setWindowTitle(_translate("Form", ""))
         self.TitleLabel.setText(_translate("Form", "Digital Filter Designer - 2024"))
         self.AddBandButton.setText(_translate("Form", "Add Band"))
         self.ClearAllButton.setText(_translate("Form", "Clear All"))
@@ -192,6 +194,10 @@ class Ui_Form(object):
 
     def add_band(self):
         if len(self.bands_list) >= 8:
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle(" ")
+            msg.setText("Maximum number of Bands is 8      ")
+            msg.exec_()
             return
         edit1 = QtWidgets.QLineEdit(Form)
         edit1.setFont(QtGui.QFont("Century Gothic"))
@@ -201,6 +207,7 @@ class Ui_Form(object):
         edit3 = QtWidgets.QLineEdit(Form)
         edit3.textChanged.connect(self.plot_on_canvas)
         edit4 = QtWidgets.QLineEdit(Form)
+        edit4.textChanged.connect(self.plot_on_canvas)
         edit = QtWidgets.QHBoxLayout()
         edit.addWidget(edit1)
         edit.addWidget(edit2)
@@ -239,7 +246,6 @@ class Ui_Form(object):
             float(val)
             return True
         except ValueError:
-            print(f"Cannot parse {val}")
             return False
 
     def create_filter(self):
@@ -253,22 +259,33 @@ class Ui_Form(object):
             
             iter = 0
             for edit in self.bands_list:
+                iter += 1
                 lower = edit.itemAt(0).widget().text()
                 upper = edit.itemAt(1).widget().text()
                 gain = edit.itemAt(2).widget().text()
                 weight = edit.itemAt(3).widget().text()
-                print(f"weight: {weight}")
 
                 if self.is_valid_float(lower) and self.is_valid_float(upper) and self.is_valid_float(gain) and self.is_valid_float(weight):
-                    iter += 1
                     lower = float(lower)
                     upper = float(upper)
                     gain = float(gain)
                     weight = float(weight)
 
+                    if weight < 1 or weight > 10:
+                        msg = QtWidgets.QMessageBox()
+                        msg.setWindowTitle("Error ")
+                        msg.setText(f"Weight of band {iter} must be between 1 and 10    ")
+                        msg.exec_()
+                        self.filter_created = 0
+                        self.filter = None
+                        return 4
+
                     if lower >= upper:
                         self.filter_created = 0
-                        print("Cannot create filter: band edges are not in ascending order")
+                        msg = QtWidgets.QMessageBox()
+                        msg.setWindowTitle("Error ")
+                        msg.setText(f"Band edges in band {iter} are not in ascending order    ")
+                        msg.exec_()
                         self.filter = None
                         return 0    # not good -> band edges are not in ascending order or transition is zero
                     else:
@@ -280,15 +297,38 @@ class Ui_Form(object):
                 else:
                     self.filter_created = 0
                     self.filter = None
-                    print("Cannot create filter: non-digit inputs")
+                    msg = QtWidgets.QMessageBox()
+                    msg.setWindowTitle("Error ")
+                    msg.setText("Non-numerical or empty input    ")
+                    msg.exec_()
                     return 2 # non-digits input
         else:
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle("Error ")
+            msg.setText("Minimum number of bands is 2    ")
+            msg.exec_()
             self.filter_created = 0
             self.filter = None
             return 1    # minimum is two bands
         
         fs = bands[-1] * 2
+        bands[0] = 0.0
 
+        # check if the order is ascending
+        isAscending = True
+        for i in range(len(bands) - 1):
+            if bands[i] > bands[i+1]:
+                isAscending = False
+                break
+        if isAscending == False:
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle("Error ")
+            msg.setText("Band edges are not in ascending order    ")
+            msg.exec_()
+            self.filter_created = 0
+            self.filter = None
+            return 3
+        print("Filter is being created")
         self.filter = FIR.FIR_Filter(fs, numtaps, bands, desired, weights)
         self.filter_created = 1
         return 1
@@ -315,15 +355,15 @@ class Ui_Form(object):
                     try:
                         lower = float(lower)
                     except ValueError:
-                        print("Could not convert the string to a float")
+                        pass
                     try:
                         upper = float(upper)
                     except ValueError:
-                        print("Could not convert the string to a float")
+                        pass
                     try:
                         gain = float(gain)
                     except ValueError:
-                        print("Could not convert the string to a float")
+                        pass
                     if lower < upper:
                         x.append(lower)
                         x.append(upper)
@@ -338,20 +378,42 @@ class Ui_Form(object):
                 break
         if isAscending == True:
             plt.plot(x, y)
+            plt.title("Expected Response")
             # refresh canvas
             self.canvas.draw()
 
+    def enable_buttons(self, en):
+        #self.PlotButton.setEnabled(en)
+        self.CheckButton.setEnabled(en)
+        self.CodeButton.setEnabled(en)
+        self.DeleteLastButton.setEnabled(en)
+        self.ClearAllButton.setEnabled(en)
+        self.AddBandButton.setEnabled(en)
+        self.SaveButton.setEnabled(en)
+        self.PlotButton.setEnabled(en)
+        QtWidgets.QApplication.processEvents()
+
 
     def plot_clicked(self):
-        print("plot clicked")
+        # disable buttons
+        self.enable_buttons(False)
+        print("Buttons disabled")
+
         if self.filter_created == 0:
             self.create_filter()
+
         if self.filter_created == 0:
-            print("Problems with input")
+            self.enable_buttons(True)
+            
             return 1    # problem with inputs
         
         else:
             self.filter.PlotAmplitudeLinear()
+            self.filter.PlotAmplitudeLogarithmic()
+            self.filter.PlotImpulse()
+
+            self.enable_buttons(True)
+            return
 
 
 if __name__ == "__main__":
@@ -362,3 +424,4 @@ if __name__ == "__main__":
     ui.setupUi(Form)
     Form.show()
     sys.exit(app.exec_())
+
