@@ -146,10 +146,10 @@ class FIR_Filter():
         fig3.show()
 
 
-    def SaveCoeffs(self):
+    def SaveCoeffs(self, path):
         if self.computedCoeffs == 0:
             self.Impulse()
-        fileName = 'coefficients.csv'
+        fileName = f"{path}/coefficients.csv"
         np.savetxt(fileName, self.coeffs, delimiter=',')
 
     def PrintCoeffs(self):

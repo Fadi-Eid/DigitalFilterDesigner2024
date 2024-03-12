@@ -8,6 +8,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         
         self.filter = None
+        self.path = "C:/Users/FADI/Documents/DigitalFilterDesign/App/Arbitray_Advanced"
         Form.setObjectName("Digital Filter Designer")
         Form.resize(898, 575)
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(Form)
@@ -45,9 +46,12 @@ class Ui_Form(object):
         self.spinBox.setToolTip("Filter length")
         
         self.AddBandButton = QtWidgets.QPushButton(Form)
+        self.AddBandButton.setIcon(QtGui.QIcon('Add.png'))
         self.AddBandButton.setMaximumSize(QtCore.QSize(100, 16777215))
         self.AddBandButton.setObjectName("AddBandButton")
         self.AddBandButton.clicked.connect(self.add_band)
+        self.AddBandButton.setIcon(QtGui.QIcon(f"{self.path}/assets/Add.png"))
+        
         self.horizontalLayout.addWidget(self.AddBandButton)
         self.horizontalLayout.addWidget(self.spinBox)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -62,11 +66,13 @@ class Ui_Form(object):
         self.ClearAllButton.setMaximumSize(QtCore.QSize(100, 16777215))
         self.ClearAllButton.setObjectName("ClearAllButton")
         self.ClearAllButton.clicked.connect(self.clear_all_clicked)
+        self.ClearAllButton.setIcon(QtGui.QIcon(f"{self.path}/assets/Clear.png"))
         self.horizontalLayout_2.addWidget(self.ClearAllButton)
         self.DeleteLastButton = QtWidgets.QPushButton(Form)
         self.DeleteLastButton.setMaximumSize(QtCore.QSize(100, 16777215))
         self.DeleteLastButton.setObjectName("DeleteLastButton")
         self.DeleteLastButton.clicked.connect(self.delete_last_clicked)
+        self.DeleteLastButton.setIcon(QtGui.QIcon(f"{self.path}/assets/Delete.png"))
         self.horizontalLayout_2.addWidget(self.DeleteLastButton)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.verticalLayout.setStretch(0, 1)
@@ -102,17 +108,22 @@ class Ui_Form(object):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.SaveButton = QtWidgets.QPushButton(Form)
         self.SaveButton.setObjectName("SaveButton")
+        self.SaveButton.setIcon(QtGui.QIcon(f"{self.path}/assets/Save.png"))
+        self.SaveButton.clicked.connect(self.save_coeffs)
         self.horizontalLayout_3.addWidget(self.SaveButton, 0, QtCore.Qt.AlignVCenter)
         self.PlotButton = QtWidgets.QPushButton(Form)
         self.PlotButton.setObjectName("PlotButton")
         self.PlotButton.clicked.connect(self.plot_clicked)
+        self.PlotButton.setIcon(QtGui.QIcon(f"{self.path}/assets/Plot.png"))
         self.horizontalLayout_3.addWidget(self.PlotButton, 0, QtCore.Qt.AlignVCenter)
         self.CheckButton = QtWidgets.QPushButton(Form)
         self.CheckButton.setObjectName("CheckButton")
         self.CheckButton.clicked.connect(self.check_clicked)
+        self.CheckButton.setIcon(QtGui.QIcon(f"{self.path}/assets/Check.png"))
         self.horizontalLayout_3.addWidget(self.CheckButton, 0, QtCore.Qt.AlignVCenter)
         self.CodeButton = QtWidgets.QPushButton(Form)
         self.CodeButton.setObjectName("CodeButton")
+        self.CodeButton.setIcon(QtGui.QIcon(f"{self.path}/assets/Code.png"))
         self.horizontalLayout_3.addWidget(self.CodeButton, 0, QtCore.Qt.AlignVCenter)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         self.verticalLayout_2.setStretch(0, 6)
@@ -162,15 +173,17 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", ""))
+        Form.setWindowTitle(_translate("Form", " "))
+        Form.setWindowIcon(QtGui.QIcon(f"{self.path}/assets/icon.png"))
+        
         self.TitleLabel.setText(_translate("Form", "Digital Filter Designer - 2024"))
-        self.AddBandButton.setText(_translate("Form", "Add Band"))
-        self.ClearAllButton.setText(_translate("Form", "Clear All"))
-        self.DeleteLastButton.setText(_translate("Form", "Delete Last"))
-        self.SaveButton.setText(_translate("Form", "Save"))
-        self.PlotButton.setText(_translate("Form", "Plot"))
-        self.CheckButton.setText(_translate("Form", "Check"))
-        self.CodeButton.setText(_translate("Form", "Code"))
+        self.AddBandButton.setText(_translate("Form", " Add Band"))
+        self.ClearAllButton.setText(_translate("Form", " Clear All"))
+        self.DeleteLastButton.setText(_translate("Form", " Delete Last"))
+        self.SaveButton.setText(_translate("Form", " Save"))
+        self.PlotButton.setText(_translate("Form", " Plot"))
+        self.CheckButton.setText(_translate("Form", " Check"))
+        self.CodeButton.setText(_translate("Form", " Code"))
         self.DelayLabel.setText(_translate("Form", "Delay: "))
         self.AvgHealthLabel.setText(_translate("Form", "Avg. Health:"))
 
@@ -207,7 +220,7 @@ class Ui_Form(object):
         edit3 = QtWidgets.QLineEdit(Form)
         edit3.textChanged.connect(self.plot_on_canvas)
         edit4 = QtWidgets.QLineEdit(Form)
-        edit4.textChanged.connect(self.plot_on_canvas)
+        edit4.textChanged.connect(self.restart_filter)
         edit = QtWidgets.QHBoxLayout()
         edit.addWidget(edit1)
         edit.addWidget(edit2)
@@ -336,6 +349,21 @@ class Ui_Form(object):
 
     def check_clicked(self):
         pass
+
+    def save_coeffs(self):
+        self.enable_buttons(False)
+        if self.filter_created == 0:
+            self.create_filter()
+        if self.filter_created == 0:
+            self.enable_buttons(True)
+            return 5
+        folder_dialog = QtWidgets.QFileDialog()
+        folder = folder_dialog.getExistingDirectory()
+        if folder == "":
+            self.enable_buttons(True)
+            return 6
+        self.filter.SaveCoeffs(folder)
+        self.enable_buttons(True)
                 
 
     def plot_on_canvas(self):
@@ -411,7 +439,6 @@ class Ui_Form(object):
             self.filter.PlotAmplitudeLinear()
             self.filter.PlotAmplitudeLogarithmic()
             self.filter.PlotImpulse()
-
             self.enable_buttons(True)
             return
 
