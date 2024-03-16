@@ -350,7 +350,37 @@ class Ui_Form(object):
 
 
     def check_clicked(self):
-        pass
+        # validate all inputs
+        self.enable_buttons(False)
+        if self.filter_created == 0:
+            self.create_filter()
+        if self.filter_created == 0:
+            self.enable_buttons(True)
+            self.DelayLabel.setText("Delay:")
+            self.AvgHealthLabel.setText("Health: ")
+            return 5
+        delay = self.filter.Delay()
+        health = self.filter.HealthScore()
+        if delay >= 1000:
+            self.DelayLabel.setText("Delay: " + str(delay/1000) + "s")
+        else: 
+            self.DelayLabel.setText("Delay: " + str(delay) + "ms")
+        self.AvgHealthLabel.setText("Health: " + health)
+        if health == "Best":
+            self.AvgHealthLabel.setStyleSheet("background-color : green")
+        elif health == "Good":
+            self.AvgHealthLabel.setStyleSheet("background-color : lightgreen")
+        elif health == "Average":
+            self.AvgHealthLabel.setStyleSheet("background-color : yellow")
+        elif health == "Below Average":
+            self.AvgHealthLabel.setStyleSheet("background-color : orange")
+        else:
+            self.AvgHealthLabel.setStyleSheet("background-color : red")
+
+        
+
+        self.enable_buttons(True)
+
 
     def save_coeffs(self):
         self.enable_buttons(False)
@@ -366,9 +396,12 @@ class Ui_Form(object):
             return 6
         self.filter.SaveCoeffs(folder)
         self.enable_buttons(True)
-                
+
 
     def plot_on_canvas(self):
+        self.DelayLabel.setText("Delay: ")
+        self.AvgHealthLabel.setText("Health: ")
+        self.AvgHealthLabel.setStyleSheet("background-color: ")
         self.filter_created = 0
         self.filter = None
         # clear the canvas
@@ -395,8 +428,8 @@ class Ui_Form(object):
                     try:
                         gain = float(gain)
                     except ValueError:
-                        self.figure.clear()
-                        return
+                        print("Problem")
+                        pass
                     if lower < upper:
                         x.append(lower)
                         x.append(upper)

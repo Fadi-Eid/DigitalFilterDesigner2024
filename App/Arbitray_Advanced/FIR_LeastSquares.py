@@ -30,30 +30,30 @@ class FIR_Filter():
 
         M = (self.numtaps-1) // 2
 
-        self.bands = np.asarray(self.bands).flatten() / self.nyq    
-        self.bands.shape = (-1, 2)
+        self.bands1 = np.asarray(self.bands).flatten() / self.nyq    
+        self.bands1.shape = (-1, 2)
 
-        self.desired = np.asarray(self.desired).flatten()
-        self.desired.shape = (-1, 2)
+        self.desired1 = np.asarray(self.desired).flatten()
+        self.desired1.shape = (-1, 2)
 
         if self.weight is None:
-            self.weight = np.ones(len(self.desired))
+            self.weight = np.ones(len(self.desired1))
         self.weight = np.asarray(self.weight).flatten()
 
         n = np.arange(self.numtaps)[:, np.newaxis, np.newaxis]
-        q = np.dot(np.diff(np.sinc(self.bands * n) * self.bands, axis=2)[:, :, 0], self.weight)
+        q = np.dot(np.diff(np.sinc(self.bands1 * n) * self.bands1, axis=2)[:, :, 0], self.weight)
 
         Q1 = toeplitz(q[:M+1])
         Q2 = hankel(q[:M+1], q[M:])
         Q = Q1 + Q2
 
         n = n[:M + 1]
-        m = (np.diff(self.desired, axis=1) / np.diff(self.bands, axis=1))
-        c = self.desired[:, [0]] - self.bands[:, [0]] * m
-        b = self.bands * (m*self.bands + c) * np.sinc(self.bands * n)
+        m = (np.diff(self.desired1, axis=1) / np.diff(self.bands1, axis=1))
+        c = self.desired1[:, [0]] - self.bands1[:, [0]] * m
+        b = self.bands1 * (m*self.bands1 + c) * np.sinc(self.bands1 * n)
 
-        b[0] -= m * self.bands * self.bands / 2.
-        b[1:] += m * np.cos(n[1:] * np.pi * self.bands) / (np.pi * n[1:]) ** 2
+        b[0] -= m * self.bands1 * self.bands1 / 2.
+        b[1:] += m * np.cos(n[1:] * np.pi * self.bands1) / (np.pi * n[1:]) ** 2
         b = np.dot(np.diff(b, axis=2)[:, :, 0], self.weight)
 
         a = np.linalg.solve(Q, b)
@@ -164,12 +164,81 @@ class FIR_Filter():
         return delay
 
     # compute the amplitude response
-    def Amplitude(self):
-        if self.computedCoeffs == 0:
-            self.Impulse()
-        Hf = np.abs(np.fft.fft(self.coeffs, self.numtaps))   # amplitude response
+     # compute the amplitude response
+    def Amplitude(self, padd=None):
+        if padd == None:
+            if self.computedCoeffs == 0:
+                self.Impulse()
+            Hf = np.abs(np.fft.fft(self.coeffs, self.numtaps))   # amplitude response
+        else:
+            if self.computedCoeffs == 0:
+                self.Impulse()
+            nfft = self.numtaps*padd
+            sampling = self.fs    # 2 Hz
+            Hf = np.abs(np.fft.fft(self.coeffs, nfft))  # y-axis
+            #freq = np.fft.fftfreq(nfft, d=1/sampling)   # x-axis
         return Hf
     
+
+    def HealthScore(self):
+        health = 0
+        padd = 5
+        M = (self.numtaps*padd) // 2 + 1 # half
+
+        actual = self.Amplitude(padd)   # y-axis
+        actual = actual[:M]
+        freq = np.fft.fftfreq(self.numtaps*padd, d=1/self.fs)   # x-axis
+        freq = freq[:M]
+
+        count = 0
+        
+        for i in range(1, len(self.bands)-1, 2):
+            count += 1
+            # find the edges values (frequencies)
+            first_edge_val = self.bands[i]
+            second_edge_val = self.bands[i+1]
+            # find the corresponding indices in actual[] and freq[] arrays
+            first_edge_index = 0
+            second_edge_index = 0
+
+            for j in range(0, len(freq)):
+                if freq[j] >= first_edge_val:
+                    first_edge_index = j
+                    break
+            for j in range(0, len(freq)):
+                if freq[j] >= second_edge_val:
+                    second_edge_index = j
+                    break
+
+            if first_edge_index == second_edge_index:
+                second_edge_index += 1
+
+            transition_freq = freq[first_edge_index:second_edge_index]
+            transition_gain = actual[first_edge_index:second_edge_index]
+
+            # create the perfect transition
+            # create the ideal transition
+            first_desired_val = self.desired[i]
+            second_desired_val = self.desired[i+1]
+            ideal = np.linspace(first_desired_val, second_desired_val, len(transition_freq))
+            mse = np.mean((transition_gain - ideal) ** 2)
+            health += mse
+            
+
+        health /= count
+
+        print(health)
+        
+        if health > 0 and health < 0.03:
+            return  "Best"
+        if health >= 0.03 and health < 0.1:
+            return "Good"
+        if health >=0.1 and health < 0.3:
+            return "Average"
+        if health >= 0.3 and health < 0.6:
+            return "Below Average"
+        else:
+            return "Not Recommended"
 
 
 ######################################################################################
