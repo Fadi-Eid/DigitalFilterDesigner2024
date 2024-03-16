@@ -124,6 +124,7 @@ class Ui_Form(object):
         self.CodeButton = QtWidgets.QPushButton(Form)
         self.CodeButton.setObjectName("CodeButton")
         self.CodeButton.setIcon(QtGui.QIcon(f"{self.path}/assets/Code.png"))
+        self.CodeButton.clicked.connect(self.generateCode)
         self.horizontalLayout_3.addWidget(self.CodeButton, 0, QtCore.Qt.AlignVCenter)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         self.verticalLayout_2.setStretch(0, 6)
@@ -480,6 +481,28 @@ class Ui_Form(object):
             self.filter.PlotImpulse()
             self.enable_buttons(True)
             return
+        
+    def generateCode(self):
+        self.enable_buttons(False)
+        if self.filter_created == 0:
+            self.create_filter()
+        if self.filter_created == 0:
+            self.enable_buttons(True)
+            return 5
+        
+        folder_dialog = QtWidgets.QFileDialog()
+        folder = folder_dialog.getExistingDirectory()
+
+        if folder == "":
+            self.enable_buttons(True)
+            return 6     
+           
+        self.filter.GenerateCode(folder)
+        self.enable_buttons(True)
+        
+        return
+
+
 
 
 if __name__ == "__main__":

@@ -239,6 +239,19 @@ class FIR_Filter():
             return "Below Average"
         else:
             return "Not Recommended"
+        
+    def GenerateCode(self, path):
+        if self.computedCoeffs == 0:
+            self.Impulse()
+
+        fileName = f"{path}/code.c"
+        part1 = "#include <stdio.h>\n#include <stdint.h>"
+        part1 = part1 + "\n\n/*Not implemented yet*/"
+        with open(fileName, "w") as file:
+            # Write the string to the file
+            file.write(part1)
+        
+
 
 
 ######################################################################################
