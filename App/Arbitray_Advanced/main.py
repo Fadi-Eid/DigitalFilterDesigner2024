@@ -154,7 +154,7 @@ class Ui_Form(object):
         self.AvgHealthLabel.setObjectName("AvgHealthLabel")
         self.horizontalLayout_5.addWidget(self.AvgHealthLabel)
         self.verticalLayout_5.addLayout(self.horizontalLayout_5)
-        self.verticalLayout_5.setStretch(3, 1)
+        self.verticalLayout_5.setStretch(2, 1)
         self.verticalLayout_6.addLayout(self.verticalLayout_5)
 
         self.retranslateUi(Form)
@@ -186,6 +186,7 @@ class Ui_Form(object):
         self.CodeButton.setText(_translate("Form", " Code"))
         self.DelayLabel.setText(_translate("Form", "Delay: "))
         self.AvgHealthLabel.setText(_translate("Form", "Avg. Health:"))
+        
 
     def add_band_info(self):
         label1 = QtWidgets.QLabel("Lower Edge")
@@ -204,6 +205,7 @@ class Ui_Form(object):
         self.formLayout.addRow('Band #', label)
         self.filter_created = 0
         self.filter = None
+        self.plot_on_canvas()
 
     def add_band(self):
         if len(self.bands_list) >= 8:
@@ -383,15 +385,18 @@ class Ui_Form(object):
                     try:
                         lower = float(lower)
                     except ValueError:
-                        pass
+                        self.figure.clear()
+                        return
                     try:
                         upper = float(upper)
                     except ValueError:
-                        pass
+                        self.figure.clear()
+                        return
                     try:
                         gain = float(gain)
                     except ValueError:
-                        pass
+                        self.figure.clear()
+                        return
                     if lower < upper:
                         x.append(lower)
                         x.append(upper)
@@ -406,7 +411,8 @@ class Ui_Form(object):
                 break
         if isAscending == True:
             plt.plot(x, y)
-            plt.title("Expected Response")
+            plt.title("Expected Response", fontsize=11)
+            plt.style.use('ggplot')
             # refresh canvas
             self.canvas.draw()
 
