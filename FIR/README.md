@@ -12,8 +12,9 @@ The disatvantages of this method is that for large attenuation values, the gener
 > Transition band may need to be narrowed (by adjusting the parameters) if it is larger than specified in the designed filter.
 > Maximum attenuation that can be acheived using this filter is ~170dB, values greater than this value "can" be reached, but require tweaking (by trial and error) to value of the weight "K", as well as the calculations that determines the filter's order.
 
-For the validation of any generated filter, the provided Python code will diplay three plots:
-1. **Impulse response + window function**: This plot can be used to visually check the shape of the window function and the sinc shaped impulse response.
+
+For the validation of any generated filter, the provided Python APIs can diplay three plots:
+1. **Impulse response**: This plot can be used to visually check the shape of the impulse response.
 1. **Magnitude response (Logarithmic)**: This plot is the most important plot, and should be used to check for the validity of the designed filter by checking the peak amplitude of the first lobe in the stop-band
 1. **Magnitude response (Linear)**: This plot can be used to visually check the overall shape of thefrequency response of the filter, the ripple in the pass-band and stop-band, and most importantly, to validate the transition band width.
 > The validation process will be outlined later in this document.
