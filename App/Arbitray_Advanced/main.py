@@ -127,7 +127,7 @@ class Ui_Form(object):
         self.CodeButton.clicked.connect(self.generateCode)
         self.horizontalLayout_3.addWidget(self.CodeButton, 0, QtCore.Qt.AlignVCenter)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-        self.verticalLayout_2.setStretch(0, 6)
+        self.verticalLayout_2.setStretch(2, 6)
         self.verticalLayout_2.setStretch(1, 1)
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         self.horizontalLayout_4.setStretch(1, 2)
@@ -213,6 +213,7 @@ class Ui_Form(object):
             msg = QtWidgets.QMessageBox()
             msg.setWindowTitle(" ")
             msg.setText("Maximum number of Bands is 8      ")
+            msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             msg.exec_()
             return
         edit1 = QtWidgets.QLineEdit(Form)
@@ -291,6 +292,7 @@ class Ui_Form(object):
                         msg = QtWidgets.QMessageBox()
                         msg.setWindowTitle("Error ")
                         msg.setText(f"Weight of band {iter} must be between 1 and 10    ")
+                        msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
                         msg.exec_()
                         self.filter_created = 0
                         self.filter = None
@@ -301,6 +303,7 @@ class Ui_Form(object):
                         msg = QtWidgets.QMessageBox()
                         msg.setWindowTitle("Error ")
                         msg.setText(f"Band edges in band {iter} are not in ascending order    ")
+                        msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
                         msg.exec_()
                         self.filter = None
                         return 0    # not good -> band edges are not in ascending order or transition is zero
@@ -315,13 +318,15 @@ class Ui_Form(object):
                     self.filter = None
                     msg = QtWidgets.QMessageBox()
                     msg.setWindowTitle("Error ")
-                    msg.setText("Non-numerical or empty input    ")
+                    msg.setText("Non-numerical or empty input")
+                    msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
                     msg.exec_()
                     return 2 # non-digits input
         else:
             msg = QtWidgets.QMessageBox()
             msg.setWindowTitle("Error ")
-            msg.setText("Minimum number of bands is 2    ")
+            msg.setText("Minimum number of bands is 2")
+            msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             msg.exec_()
             self.filter_created = 0
             self.filter = None
@@ -339,12 +344,13 @@ class Ui_Form(object):
         if isAscending == False:
             msg = QtWidgets.QMessageBox()
             msg.setWindowTitle("Error ")
-            msg.setText("Band edges are not in ascending order    ")
+            msg.setText("Band edges are not in ascending order")
+            msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             msg.exec_()
             self.filter_created = 0
             self.filter = None
             return 3
-        print("Filter is being created")
+        
         self.filter = FIR.FIR_Filter(fs, numtaps, bands, desired, weights)
         self.filter_created = 1
         return 1
@@ -396,6 +402,13 @@ class Ui_Form(object):
             self.enable_buttons(True)
             return 6
         self.filter.SaveCoeffs(folder)
+        msg = QtWidgets.QMessageBox()
+        msg.setWindowTitle("Success ")
+        msg.setText("Coefficients saved: coefficients.csv")
+        msg.setIcon(QtWidgets.QMessageBox.Icon.Information)
+        msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Close)
+        msg.exec_()
+
         self.enable_buttons(True)
 
 
@@ -429,7 +442,6 @@ class Ui_Form(object):
                     try:
                         gain = float(gain)
                     except ValueError:
-                        print("Problem")
                         pass
                     if lower < upper:
                         x.append(lower)
@@ -465,7 +477,6 @@ class Ui_Form(object):
     def plot_clicked(self):
         # disable buttons
         self.enable_buttons(False)
-        print("Buttons disabled")
 
         if self.filter_created == 0:
             self.create_filter()
@@ -498,6 +509,14 @@ class Ui_Form(object):
             return 6     
            
         self.filter.GenerateCode(folder)
+
+        msg = QtWidgets.QMessageBox()
+        msg.setWindowTitle("Success ")
+        msg.setText("MATLAB code generated: filter.m")
+        msg.setIcon(QtWidgets.QMessageBox.Icon.Information)
+        msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Close)
+        msg.exec_()
+
         self.enable_buttons(True)
         
         return
