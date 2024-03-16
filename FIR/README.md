@@ -10,7 +10,7 @@ The disatvantages of this method is that for large attenuation values, the gener
 1. __**Weighted least-squares method**__: This method consists of finding the optimal filter coefficients in the least-squares sense, by solving a linear system of equations. This method provide fewer filter coefficients for the same filter specifications compared to the windowed-sinc and the kaiser adjustable window methods, while also allowing for a high order filter to be designed (attenuation > 160dB and/or narrow transition band).
 > The behavior in the transition band is not specified thus, should be validated. It is possible for the transition band to behave badly for filters with extreme parameters.
 > Transition band may need to be narrowed (by adjusting the parameters) if it is larger than specified in the designed filter.
-> Maximum attenuation that can be acheived using this filter is ~170dB, values greater than this value "can" be reached, but require tweaking (by trial and error) to value of the weight "K", as well as the calculations that determines the filter's order.
+> Maximum attenuation that can be acheived using this filter is ~170dB, values greater than this value "can" be reached, but requires trial and error tweaking.
 
 
 For the validation of any generated filter, the provided Python APIs can diplay three plots:
