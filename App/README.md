@@ -21,4 +21,11 @@ For a standalone installation (Might be a little bit slow to load), see below.
 [YouTube](https://youtu.be/WzR1Gm4fmk0)
 
 # Screenshots
+![image](https://github.com/Fadi-Eid/DigitalFilterDesigner2024/assets/113466842/a176b540-5d5f-408c-ac4a-b5fbbdd53ad9)
+
+![image](https://github.com/Fadi-Eid/DigitalFilterDesigner2024/assets/113466842/672b5cc8-3dc0-4be9-91ae-71db9954c205)
+
+![image](https://github.com/Fadi-Eid/DigitalFilterDesigner2024/assets/113466842/f2fa6f5f-7cb0-447d-87a4-479fb8e512cd)
+
+![image](https://github.com/Fadi-Eid/DigitalFilterDesigner2024/assets/113466842/b13b19c7-c830-4957-9723-1d837c094c61)
 
