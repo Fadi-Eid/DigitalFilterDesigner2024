@@ -15,7 +15,7 @@ For a standalone installation (Might be a little bit slow to load), see below.
 
 
 # Demonstration (V2.0)
-[YouTube](...)
+[YouTube](https://youtu.be/LXTdjXytBno?si=6UF3J5w3Hi518mu3)
 
 # Video demo (Old version)
 [YouTube](https://youtu.be/WzR1Gm4fmk0)
