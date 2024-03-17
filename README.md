@@ -1,7 +1,7 @@
 # DigitalFilterDesigner 2024
 ![DIGITAL FILTER DESIGNER](https://github.com/Fadi-Eid/DigitalFilterDesigner2024/assets/113466842/5a0c8081-733b-4910-a24a-2634a2bf702a)
 
-## Current Version: V2.0
+## Current Version: V2.0 - Stable
 
 # Introduction:
 **DigitalFilterDesigner 2024** is an open-source project dedicated to simplifying the process of digital linear phase (FIR) filter design. The aim is to facilitate the creation of customizable multiband digital filters with ease of design and implementation.
@@ -42,6 +42,10 @@ SOFTWARE.*
 
 # Screenshots
 ![image](https://github.com/Fadi-Eid/DigitalFilterDesigner2024/assets/113466842/f0064b10-096b-4dfe-b6ee-300dc5e948ee)
+
+
+![image](https://github.com/Fadi-Eid/DigitalFilterDesigner2024/assets/113466842/76ef7e28-3c70-439d-823b-33a964752fd7)
+
 
 
 ![image](https://github.com/Fadi-Eid/DigitalFilterDesigner2024/assets/113466842/8e486633-400b-48f1-b0a8-a2aae55f5097)
