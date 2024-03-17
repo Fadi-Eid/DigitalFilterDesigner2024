@@ -236,10 +236,17 @@ class FIR_Filter():
 ######################################################################################
     
 # create the filter class
-Filter = FIR_Filter(4000, 501, [0, 500, 580, 1000, 1020, 2000], [1, 1, 0, 0, 1, 1], [1, 2, 1])
+Fs = 4000
+Length = 501
+band_edges = [0, 500, 505, 720, 730, 1100]
+desired_gain = [2, 2, 0, 0, 1.6, 1.6]
+weights = [1, 2, 1]
+Filter = FIR_Filter(Fs, Length, band_edges, desired_gain, weights)
+
+# filer's methods
 Filter.PlotAmplitudeLinear()
-# Filter.PlotAmplitudeLogarithmic()
-# Filter.PlotImpulse()
-# Filter.PrintCoeffs()
-# Filter.SaveCoeffs()
+Filter.PlotAmplitudeLogarithmic()
+Filter.PlotImpulse()
+Filter.PrintCoeffs()
+Filter.SaveCoeffs()
 Filter.HealthScore()
