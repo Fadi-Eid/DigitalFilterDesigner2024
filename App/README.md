@@ -11,7 +11,7 @@ For a standalone installation (Might be a little bit slow to load), see below.
 
 
 # Standalone installation
-[Executable](...)
+[Executable](https://drive.google.com/file/d/126CAmOu6LSp0hBe2PsIUMlClEP6Mb2Om/view?usp=sharing)
 
 
 # Demonstration (V2.0)
