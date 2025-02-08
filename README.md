@@ -10,6 +10,22 @@ The current version offers Python code for the automatic design of FIR low-pass 
 
 The Least-Squares method, which is the most versatile and general method, is available in GUI form.
 
+# Building from source
+The software was tested using **_Python 3.10.6_** but should also work for any python version above 3.10.
+Clone this repository on you machine, intsall the required modules listed in _requirements.txt_ file and run the program using the command _**python main.py**_ on Windows and _**python3 main.py**_ on Linux.
+For a standalone installation (Might be a little bit slow to load), see below.
+
+
+# Standalone installation
+[Executable](https://drive.google.com/file/d/126CAmOu6LSp0hBe2PsIUMlClEP6Mb2Om/view?usp=sharing)
+
+
+# Demonstration (V2.0)
+[YouTube](https://youtu.be/LXTdjXytBno?si=6UF3J5w3Hi518mu3)
+
+# Video demo (Old version)
+[YouTube](https://youtu.be/WzR1Gm4fmk0)
+
 # Repository Structure:
 ### The repository consists of three main folders:
 
